@@ -118,7 +118,7 @@ class LoginScreen extends StatelessWidget {
         // ),
       ],
       onSubmitAnimationCompleted: () {
-        // 不在这里处理页面跳转，改在认证回调中处理
+        //
       },
       onRecoverPassword: _recoverPassword,
     );

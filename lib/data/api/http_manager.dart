@@ -7,6 +7,7 @@ import '../../config_dev.dart';
 
 String? apiKey = dotenv.env['OPENAI_API_KEY'];
 
+// stream callback
 Future<void> fetchApiResponse(
     StreamController<String> controller, String userMessage) async {
   final client = http.Client();

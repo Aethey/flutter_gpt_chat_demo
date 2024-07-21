@@ -28,7 +28,7 @@ class DioManager {
     // Add other Dio configurations here if needed
   }
 
-  // Regular API call
+  // Regular API call common
   Future<Response> fetchRegularResponse(String path,
       {Map<String, dynamic>? data}) async {
     try {
@@ -96,7 +96,7 @@ class DioManager {
               },
               onDone: () => controller.close(),
               onError: (e) {
-                controller.addError('获取数据失败: $e');
+                controller.addError('request data failed: $e');
                 controller.close();
               });
     } catch (e) {
