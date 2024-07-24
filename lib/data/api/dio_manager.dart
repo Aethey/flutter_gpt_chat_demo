@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
-import '../../config_dev.dart';
+import 'package:ry_chat/config_dev.dart';
 
 class DioManager {
   String? apiKey = dotenv.env['OPENAI_API_KEY'];
@@ -25,7 +24,17 @@ class DioManager {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
-    // Add other Dio configurations here if needed
+    // Add interceptors for logging, error handling, etc.
+    _dio.interceptors.add(LogInterceptor(responseBody: false));
+    _dio.interceptors.add(InterceptorsWrapper(
+      onError: (DioException e, handler) {
+        // Custom error handling
+        if (kDebugMode) {
+          print('DIO ERROR: ${e.message}');
+        }
+        return handler.next(e);
+      },
+    ));
   }
 
   // Regular API call common
@@ -35,14 +44,14 @@ class DioManager {
       final response = await _dio.post(path, data: data);
       return response;
     } catch (e) {
-      // Handle errors or rethrow them
-      rethrow;
+      throw _handleError(e);
     }
   }
 
   // Streamed API call for continuous responses
   Future<void> fetchStreamResponse(
-      StreamController<String> controller, String userMessage) async {
+      {required StreamController<String> controller,
+      required String userMessage}) async {
     StringBuffer accumulatedContent = StringBuffer();
 
     Options options = Options(headers: {
@@ -69,24 +78,21 @@ class DioManager {
       response.data!.stream
           .transform(StreamTransformer.fromHandlers(
               handleData: (Uint8List data, EventSink<String> sink) {
-            // 将字节数据解码为字符串，并将其添加到sink中
             String stringData = utf8.decode(data);
             sink.add(stringData);
           }, handleError: (error, stackTrace, sink) {
-            sink.addError('处理数据时发生错误: $error');
+            sink.addError('process data error: $error');
           }, handleDone: (sink) {
             sink.close();
           }))
-          .transform(LineSplitter())
+          .transform(const LineSplitter())
           .listen(
               (dataLine) {
                 if (dataLine.isEmpty || dataLine == 'data: [DONE]') {
-                  // controller.close();
                   return;
                 }
                 final jsonMap = json.decode(dataLine.replaceAll('data: ', ''));
                 if (jsonMap['choices'][0]['finish_reason'] == 'stop') {
-                  // controller.close();
                   return;
                 }
                 String content =
@@ -100,9 +106,18 @@ class DioManager {
                 controller.close();
               });
     } catch (e) {
-      print('Request failed: $e');
-      controller.addError('Failed to fetch data: $e');
+      controller.addError(_handleError(e));
       controller.close();
+    } finally {
+      // process every time
+      // controller.close();
     }
+  }
+
+  Exception _handleError(dynamic error) {
+    if (error is DioException) {
+      return Exception('API request failed: ${error.message}');
+    }
+    return Exception('An unexpected error occurred: $error');
   }
 }

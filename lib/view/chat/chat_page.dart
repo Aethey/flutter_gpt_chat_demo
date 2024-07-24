@@ -34,7 +34,8 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
       // Fetch API response
       // fetchApiResponse(responseController, _controller.text);
-      DioManager().fetchStreamResponse(responseController, _controller.text);
+      DioManager().fetchStreamResponse(
+          controller: responseController, userMessage: _controller.text);
 
       _controller.clear();
     }
