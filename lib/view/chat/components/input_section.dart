@@ -1,9 +1,6 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:ry_chat/view/chat/components/toggle_button.dart';
-
-import '../../../state/message_list_provider.dart';
 import 'custom_text_field.dart';
 
 typedef SendMessageCallback = void Function();
@@ -13,15 +10,16 @@ class InputSection extends StatelessWidget {
   final TextEditingController controller;
   final SendMessageCallback onSendMessage;
 
-  InputSection(
-      {required this.buttonType,
+  const InputSection(
+      {super.key,
+      required this.buttonType,
       required this.onSendMessage,
       required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.only(
+      borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(10.0),
         topRight: Radius.circular(10.0),
       ),

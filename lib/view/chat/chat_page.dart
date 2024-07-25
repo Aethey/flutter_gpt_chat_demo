@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
-
 import '../../data/api/dio_manager.dart';
 import '../../state/message_list_provider.dart';
 import 'components/chat_main.dart';

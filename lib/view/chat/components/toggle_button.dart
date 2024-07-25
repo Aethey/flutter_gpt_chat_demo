@@ -1,7 +1,4 @@
-import 'dart:ffi';
-
 import 'package:flutter/cupertino.dart';
-
 import 'input_section.dart';
 
 class ToggleButton extends StatelessWidget {
@@ -29,6 +26,7 @@ class ToggleButton extends StatelessWidget {
                 child: () {
                   switch (buttonType) {
                     case 0:
+                      // common state  no word no streaming
                       return Image.asset(
                         'assets/icons/microphone_black.png',
                         width: 36, // Image width
@@ -37,6 +35,7 @@ class ToggleButton extends StatelessWidget {
                         key: const ValueKey('microphone'),
                       ); // Replace Widget1 with your specific widget
                     case 1:
+                      // input state, text length > 0
                       return Image.asset(
                         'assets/icons/send_black.png',
                         width: 36, // Image width
@@ -45,6 +44,7 @@ class ToggleButton extends StatelessWidget {
                         key: const ValueKey('text'),
                       );
                     case 2:
+                      //  streaming
                       return Image.asset(
                         'assets/icons/stop_black.png',
                         width: 36, // Image width
@@ -53,6 +53,7 @@ class ToggleButton extends StatelessWidget {
                         key: const ValueKey('freeze'),
                       ); // Replace Widget2 with your specific widget
                     default:
+                      // default
                       return Image.asset(
                         'assets/icons/microphone_black.png',
                         width: 36, // Image width
