@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
-  final ValueNotifier<bool> isVoice;
+  final ValueNotifier<int> buttonType;
   final TextEditingController controller;
 
   const CustomTextField(
-      {super.key, required this.isVoice, required this.controller});
+      {super.key, required this.buttonType, required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       onTapOutside: (event) {
-        isVoice.value = !isVoice.value;
         FocusManager.instance.primaryFocus?.unfocus();
       },
-      onTap: () {
-        isVoice.value = !isVoice.value;
-      },
+      onTap: () {},
       style: const TextStyle(color: Colors.black),
       minLines: 1,
       maxLines: null,

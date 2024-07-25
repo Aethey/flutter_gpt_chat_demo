@@ -9,12 +9,12 @@ import 'custom_text_field.dart';
 typedef SendMessageCallback = void Function();
 
 class InputSection extends StatelessWidget {
-  final ValueNotifier<bool> isVoice;
+  final ValueNotifier<int> buttonType;
   final TextEditingController controller;
   final SendMessageCallback onSendMessage;
 
   InputSection(
-      {required this.isVoice,
+      {required this.buttonType,
       required this.onSendMessage,
       required this.controller});
 
@@ -38,12 +38,12 @@ class InputSection extends StatelessWidget {
               MenuButton(),
               Expanded(
                 child: CustomTextField(
-                  isVoice: isVoice,
+                  buttonType: buttonType,
                   controller: controller,
                 ),
               ),
               ToggleButton(
-                isVoice: isVoice,
+                buttonType: buttonType,
                 onSendMessage: onSendMessage,
               ),
             ],

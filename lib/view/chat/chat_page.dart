@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../../data/api/http_manager.dart';
 import '../../data/api/dio_manager.dart';
 import '../../state/message_list_provider.dart';
 import 'components/chat_main.dart';
@@ -20,7 +19,8 @@ class ChatPage extends ConsumerStatefulWidget {
 
 class _ChatPageState extends ConsumerState<ChatPage> {
   final TextEditingController _controller = TextEditingController();
-  final ValueNotifier<bool> _isVoice = ValueNotifier<bool>(true);
+  final ValueNotifier<int> _buttonType = ValueNotifier<int>(0);
+  final ValueNotifier<bool> _isStreaming = ValueNotifier<bool>(false);
 
   void _sendMessage() {
     if (_controller.text.isNotEmpty) {
@@ -34,11 +34,34 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
       // Fetch API response
       // fetchApiResponse(responseController, _controller.text);
+      _buttonType.value = 2;
+      _isStreaming.value = true;
       DioManager().fetchStreamResponse(
-          controller: responseController, userMessage: _controller.text);
+          controller: responseController,
+          userMessage: _controller.text,
+          onStreamStopCallback: () {
+            _buttonType.value = 0;
+            _isStreaming.value = false;
+          });
 
       _controller.clear();
     }
+  }
+
+  void _handleTextChange() {
+    if (_controller.text.isNotEmpty) {
+      _buttonType.value = 1;
+    } else {
+      if (!_isStreaming.value) {
+        _buttonType.value = 0;
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_handleTextChange);
   }
 
   @override
@@ -88,7 +111,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: InputSection(
-                      isVoice: _isVoice,
+                      buttonType: _buttonType,
                       controller: _controller,
                       onSendMessage: () => _sendMessage(),
                     ),

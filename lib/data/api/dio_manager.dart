@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ry_chat/config_dev.dart';
 
+typedef OnStreamStopCallback = void Function();
+
 class DioManager {
   String? apiKey = dotenv.env['OPENAI_API_KEY'];
   static final DioManager _singleton = DioManager._internal();
@@ -51,7 +53,8 @@ class DioManager {
   // Streamed API call for continuous responses
   Future<void> fetchStreamResponse(
       {required StreamController<String> controller,
-      required String userMessage}) async {
+      required String userMessage,
+      required OnStreamStopCallback onStreamStopCallback}) async {
     StringBuffer accumulatedContent = StringBuffer();
 
     Options options = Options(headers: {
@@ -86,28 +89,29 @@ class DioManager {
             sink.close();
           }))
           .transform(const LineSplitter())
-          .listen(
-              (dataLine) {
-                if (dataLine.isEmpty || dataLine == 'data: [DONE]') {
-                  return;
-                }
-                final jsonMap = json.decode(dataLine.replaceAll('data: ', ''));
-                if (jsonMap['choices'][0]['finish_reason'] == 'stop') {
-                  return;
-                }
-                String content =
-                    jsonMap['choices'][0]['delta']['content'] ?? '';
-                accumulatedContent.write(content);
-                controller.add(accumulatedContent.toString());
-              },
-              onDone: () => controller.close(),
-              onError: (e) {
-                controller.addError('request data failed: $e');
-                controller.close();
-              });
+          .listen((dataLine) {
+        if (dataLine.isEmpty || dataLine == 'data: [DONE]') {
+          return;
+        }
+        final jsonMap = json.decode(dataLine.replaceAll('data: ', ''));
+        if (jsonMap['choices'][0]['finish_reason'] == 'stop') {
+          return;
+        }
+        String content = jsonMap['choices'][0]['delta']['content'] ?? '';
+        accumulatedContent.write(content);
+        controller.add(accumulatedContent.toString());
+      }, onDone: () {
+        controller.close();
+        onStreamStopCallback();
+      }, onError: (e) {
+        controller.addError('request data failed: $e');
+        controller.close();
+        onStreamStopCallback();
+      });
     } catch (e) {
       controller.addError(_handleError(e));
       controller.close();
+      onStreamStopCallback();
     } finally {
       // process every time
       // controller.close();
