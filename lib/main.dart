@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,7 @@ Future main() async {
   await dotenv.load(fileName: ".env");
   // init DB
   await HiveDB.initHive();
+
   // init route
   final router = FluroRouter();
   MainRoutes.defineRoutes(router);

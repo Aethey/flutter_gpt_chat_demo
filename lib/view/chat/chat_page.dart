@@ -57,6 +57,13 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   }
 
   @override
+  void dispose() {
+    _controller.removeListener(_handleTextChange);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _controller.addListener(_handleTextChange);

@@ -1,6 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../config_dev.dart';
+import '../../entity/conversion.dart';
+import '../../entity/message.dart';
 
 class HiveDB {
   static const String _boxName = AppConfig.hiveBaseBoxName;
@@ -10,6 +12,8 @@ class HiveDB {
     //     await path_provider.getApplicationDocumentsDirectory();
     // Hive.init(appDocumentDir.path);
     await Hive.initFlutter();
+    Hive.registerAdapter(MessageAdapter());
+    Hive.registerAdapter(ConversionAdapter());
     await Hive.openBox(_boxName);
   }
 
@@ -27,7 +31,3 @@ class HiveDB {
     await _box.delete(key);
   }
 }
-// how to use:
-
-// HiveDB.putData('testKey', 'testValue');
-// print('Name: ${HiveDB.getData('testKey')}');
