@@ -83,6 +83,7 @@ class DioManager {
               handleData: (Uint8List data, EventSink<String> sink) {
             String stringData = utf8.decode(data);
             sink.add(stringData);
+            print(stringData);
           }, handleError: (error, stackTrace, sink) {
             sink.addError('process data error: $error');
           }, handleDone: (sink) {

@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-
+import 'dart:collection';
 import '../../config_dev.dart';
 import '../../entity/conversion.dart';
 import '../../entity/message.dart';
@@ -29,5 +29,32 @@ class HiveDB {
 
   static Future<void> removeData(String key) async {
     await _box.delete(key);
+  }
+
+  Future<void> addMessage(Message message) async {
+    var box = Hive.box<Message>('messages');
+    await box.add(message);
+  }
+
+  Future<void> addConversion(Conversion conversion) async {
+    var box = Hive.box<Conversion>('conversions');
+    await box.add(conversion);
+  }
+
+  List<Message> getAllMessages() {
+    var box = Hive.box<Message>('messages');
+    return box.values.toList();
+  }
+
+  List<Conversion> getAllConversions() {
+    var box = Hive.box<Conversion>('conversions');
+    return box.values.toList();
+  }
+
+  List<Message> getMessagesByConversationId(String conversationId) {
+    var box = Hive.box<Message>('messages');
+    return box.values
+        .where((message) => message.conversationId == conversationId)
+        .toList();
   }
 }

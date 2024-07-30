@@ -29,11 +29,11 @@ class InputSection extends StatelessWidget {
           height: 80,
           color: Colors.white
               .withOpacity(0.6), // Semi-transparent white background
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              MenuButton(),
+              const MenuButton(),
               Expanded(
                 child: CustomTextField(
                   buttonType: buttonType,

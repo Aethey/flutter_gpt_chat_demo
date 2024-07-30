@@ -4,6 +4,7 @@ import 'package:ry_chat/view/chat/components/reply_message_bubble.dart';
 import 'package:ry_chat/view/chat/components/user_message_bubble.dart';
 
 import '../../../state/message_list_provider.dart';
+import 'message_group.dart';
 
 class ChatList extends ConsumerWidget {
   const ChatList({Key? key}) : super(key: key);
