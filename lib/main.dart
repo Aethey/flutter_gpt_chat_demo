@@ -10,6 +10,7 @@ import 'package:ry_chat/routes/main_routes.dart';
 import 'package:ry_chat/data/api/dio_manager.dart';
 import 'package:ry_chat/data/database/hive_db.dart';
 import 'package:ry_chat/view/chat/chat_page.dart';
+import 'package:ry_chat/view/chat/components/markdown_part.dart';
 import 'package:ry_chat/view/login/login_page.dart';
 import 'application.dart';
 import 'firebase_options.dart';
