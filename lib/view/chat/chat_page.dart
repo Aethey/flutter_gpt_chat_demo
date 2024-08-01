@@ -10,7 +10,7 @@ import '../../state/chat_state.dart';
 import '../../state/message_list_provider.dart';
 import '../../state/session_list_state.dart';
 import 'components/chat_main.dart';
-import 'components/session_list.dart';
+import 'components/chat_session_list.dart';
 import 'components/input_section.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -25,8 +25,9 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   final TextEditingController _controller = TextEditingController();
   final ValueNotifier<int> _buttonType = ValueNotifier<int>(0);
   final ValueNotifier<bool> _isStreaming = ValueNotifier<bool>(false);
+  final ScrollController _scrollController = ScrollController();
 
-  void _sendMessage(String id) {
+  void _sendMessage(ChatSession chatSession) {
     if (_controller.text.isNotEmpty) {
       // ref.read(messageListProvider.notifier).addMessage(_controller.text, true);
       var tmpMsg = ChatMessage(
@@ -36,7 +37,16 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           temporary: false,
           timestamp: DateTime.now());
       ref.read(chatProvider.notifier).addMessage(tmpMsg);
-      HiveDB.addMessageToSession(id, tmpMsg);
+      HiveDB.addMessageToSession(chatSession.id, tmpMsg);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: Duration(milliseconds: 50),
+            curve: Curves.easeOut,
+          );
+        }
+      });
 
       // Create a new StreamController for the response
       final responseController = StreamController<String>.broadcast();
@@ -51,6 +61,18 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       DioManager().fetchStreamResponse(
           controller: responseController,
           userMessage: _controller.text,
+          chatSession: chatSession,
+          onStreamingCallback: () {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (_scrollController.hasClients) {
+                _scrollController.animateTo(
+                  _scrollController.position.maxScrollExtent,
+                  duration: const Duration(milliseconds: 50),
+                  curve: Curves.easeOut,
+                );
+              }
+            });
+          },
           onStreamStopCallback: (totalMessage) {
             _buttonType.value = 0;
             _isStreaming.value = false;
@@ -60,7 +82,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                 isFromAI: true,
                 temporary: false,
                 timestamp: DateTime.now());
-            HiveDB.addMessageToSession(id, tmpMsg);
+            HiveDB.addMessageToSession(chatSession.id, tmpMsg);
           });
 
       _controller.clear();
@@ -81,6 +103,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   void dispose() {
     _controller.removeListener(_handleTextChange);
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -97,7 +120,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     final sessionListSession = ref.watch(sessionListProvider);
     final chatSession = ref.watch(chatProvider);
     return Scaffold(
-      drawer: SessionList(sessionListSession),
+      drawer: ChatSessionList(sessionListSession),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Column(
@@ -105,7 +128,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             Expanded(
               child: Stack(
                 children: [
-                  const ChatList(), // Mock chat list
+                  ChatList(_scrollController), // Mock chat list
                   Align(
                       alignment: Alignment.topCenter,
                       child: ClipRRect(
@@ -119,21 +142,46 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                               padding: const EdgeInsets.only(left: 16),
                               height: 80,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Image.asset(
-                                    'assets/icons/chatbot.png',
-                                    width: 48, // Image width
-                                    height: 48, // Image height
-                                    fit: BoxFit.cover, // Cover fit
-                                    key: const ValueKey('text'),
+                                  Row(
+                                    children: [
+                                      Image.asset(
+                                        'assets/icons/chatbot.png',
+                                        width: 48, // Image width
+                                        height: 48, // Image height
+                                        fit: BoxFit.cover, // Cover fit
+                                        key: const ValueKey('text'),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      const Text(
+                                        "Joi",
+                                        style: TextStyle(color: Colors.black),
+                                      )
+                                    ],
                                   ),
-                                  const SizedBox(width: 4),
-                                  const Text(
-                                    "Joi",
-                                    style: TextStyle(color: Colors.black),
-                                  )
+                                  chatSession.messages.isNotEmpty
+                                      ? GestureDetector(
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(right: 8),
+                                            child: Image.asset(
+                                              'assets/icons/plus_border.png',
+                                              width: 48, // Image width
+                                              height: 48, // Image height
+                                              fit: BoxFit.cover, // Cover fit
+                                              key: const ValueKey('text'),
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            Future.microtask(() => ref
+                                                .read(chatProvider.notifier)
+                                                .setCurrentSession());
+                                          },
+                                        )
+                                      : Container()
                                 ],
                               ),
                             )),
@@ -143,7 +191,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                     child: InputSection(
                       buttonType: _buttonType,
                       controller: _controller,
-                      onSendMessage: () => _sendMessage(chatSession.id),
+                      onSendMessage: () => _sendMessage(chatSession),
                     ),
                   ),
                 ],

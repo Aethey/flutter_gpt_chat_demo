@@ -49,12 +49,17 @@ class HiveDB {
 
   static Future<List<ChatSession>> readAllChatSessions() async {
     List<ChatSession> sessions = [];
+    DateTime defaultTime = DateTime.now().subtract(Duration(days: 1));
     for (var key in _box.keys) {
       var session = _box.get(key) as ChatSession?;
       if (session != null) {
+        session = session.updateTimestamp != null
+            ? session
+            : session.copyWith(updateTimestamp: defaultTime);
         sessions.add(session);
       }
     }
+    sessions.sort((a, b) => b.updateTimestamp!.compareTo(a.updateTimestamp!));
     return sessions;
   }
 
@@ -75,9 +80,10 @@ class HiveDB {
     } else {
       var newSession = ChatSession(
         id: sessionId,
-        messages: [
-          newMessage
-        ], // Start with the new message as the first message
+        messages: [newMessage],
+        createTimestamp: DateTime.now(),
+        updateTimestamp:
+            DateTime.now(), // Start with the new message as the first message
       );
       await _box.put(sessionId, newSession);
       print('New session created with ID $sessionId');

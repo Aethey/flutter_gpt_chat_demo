@@ -9,6 +9,8 @@ final chatProvider = StateNotifierProvider<ChatNotifier, ChatSession>((ref) {
   return ChatNotifier(ChatSession(
       // recent message?
       id: const Uuid().v1(),
+      createTimestamp: DateTime.now(),
+      updateTimestamp: DateTime.now(), //
       messages: []));
 });
 
@@ -16,15 +18,23 @@ class ChatNotifier extends StateNotifier<ChatSession> {
   ChatNotifier(super.state);
 
   void addMessage(ChatMessage message) {
-    state = state.copyWith(messages: [...state.messages, message]);
+    state = state.copyWith(
+        messages: [...state.messages, message],
+        updateTimestamp: DateTime.now());
   }
 
   ChatMessage? findMessageById(String id) {
     return state.messages.firstWhereOrNull((message) => message.id == id);
   }
 
-  void setCurrentSession(String? id) async {
+  void setCurrentSession({String? id}) async {
     if (id == null) {
+      state = ChatSession(
+          // recent message?
+          id: const Uuid().v1(),
+          createTimestamp: DateTime.now(),
+          updateTimestamp: DateTime.now(),
+          messages: []);
     } else {
       ChatSession? currentChatSession = await HiveDB.readChatSessionById(id);
       if (currentChatSession != null) {
@@ -44,7 +54,8 @@ class ChatNotifier extends StateNotifier<ChatSession> {
     }).toList();
 
     if (updatedMessages != state.messages) {
-      state = state.copyWith(messages: updatedMessages);
+      state = state.copyWith(
+          messages: updatedMessages, updateTimestamp: DateTime.now());
     }
   }
 

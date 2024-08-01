@@ -11,6 +11,8 @@ class ChatSession with _$ChatSession {
   const factory ChatSession({
     @HiveField(0) required String id,
     @HiveField(1) required List<ChatMessage> messages,
+    @HiveField(2) DateTime? updateTimestamp,
+    @HiveField(3) DateTime? createTimestamp,
   }) = _ChatSession;
 
   factory ChatSession.fromJson(Map<String, dynamic> json) =>

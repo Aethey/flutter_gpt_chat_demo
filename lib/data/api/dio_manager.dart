@@ -5,7 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ry_chat/config_dev.dart';
 
+import '../../entity/chat_message.dart';
+import '../../entity/chat_session.dart';
+
 typedef OnStreamStopCallback = void Function(String totalMessage);
+typedef OnStreamingCallback = void Function();
 
 class DioManager {
   String? apiKey = dotenv.env['OPENAI_API_KEY'];
@@ -50,26 +54,70 @@ class DioManager {
     }
   }
 
+  Future<void> fetchStreamResponseNew(
+      {
+        required Map<String, dynamic> body,
+        required void Function() onProcessing,
+        required void Function() onProcessDone,
+        required void Function() onProcessError,
+        required void Function() onProcessCatch,
+        required OnStreamingCallback onStreamingCallback,
+      required OnStreamStopCallback onStreamStopCallback}) async {
+    StringBuffer accumulatedContent = StringBuffer();
+    Options options = Options(headers: {
+      'Authorization': 'Bearer $apiKey',
+      'Content-Type': 'application/json',
+      'Accept': 'text/event-stream',
+    }, responseType: ResponseType.stream);
+    try {
+      Response<ResponseBody> response = await _dio.post(
+        '/v1/chat/completions',
+        data: jsonEncode(body),
+        options: options,
+      );
+    } catch (e) {
+
+    } finally {
+      // process every time
+      // controller.close();
+    }
+  }
+
   // Streamed API call for continuous responses
   Future<void> fetchStreamResponse(
       {required StreamController<String> controller,
       required String userMessage,
+      required ChatSession chatSession,
+      required OnStreamingCallback onStreamingCallback,
       required OnStreamStopCallback onStreamStopCallback}) async {
     StringBuffer accumulatedContent = StringBuffer();
+
+    int maxHistoryCount = 10; // max history
+    List<ChatMessage> allMessages =
+        List<ChatMessage>.from(chatSession.messages ?? []);
+    allMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    int messagesCount = allMessages.length; // chat history count
+// if not 10
+    List<Map<String, String>> historyMessages = allMessages
+        .sublist(0,
+            messagesCount < maxHistoryCount ? messagesCount : maxHistoryCount)
+        .reversed // recently message，maybe need
+        .map((m) {
+      return {"role": m.isFromAI ? "assistant" : "user", "content": m.content};
+    }).toList();
+    historyMessages.add({"role": "user", "content": userMessage});
+
+    Map<String, dynamic> body = {
+      "model": AppConfig.commonModel,
+      "messages": historyMessages,
+      "stream": true
+    };
 
     Options options = Options(headers: {
       'Authorization': 'Bearer $apiKey',
       'Content-Type': 'application/json',
       'Accept': 'text/event-stream',
     }, responseType: ResponseType.stream);
-
-    Map<String, dynamic> body = {
-      "model": AppConfig.commonModel,
-      "messages": [
-        {"role": "user", "content": userMessage}
-      ],
-      "stream": true
-    };
 
     try {
       Response<ResponseBody> response = await _dio.post(
@@ -101,6 +149,7 @@ class DioManager {
         String content = jsonMap['choices'][0]['delta']['content'] ?? '';
         accumulatedContent.write(content);
         controller.add(accumulatedContent.toString());
+        onStreamingCallback();
       }, onDone: () {
         controller.close();
         onStreamStopCallback(accumulatedContent.toString() ?? "");

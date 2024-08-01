@@ -6,12 +6,16 @@ import '../../../state/chat_state.dart';
 import 'ai_message_bubble.dart';
 
 class ChatList extends ConsumerWidget {
-  const ChatList({super.key});
+  const ChatList(this.scrollController, {super.key});
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chatSession = ref.watch(chatProvider);
+    final ScrollController _scrollController = ScrollController();
+
     return ListView.builder(
+      controller: scrollController,
       padding: const EdgeInsets.only(bottom: 80, top: 80),
       itemCount: chatSession.messages.length,
       itemBuilder: (context, index) {

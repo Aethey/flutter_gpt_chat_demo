@@ -7,8 +7,8 @@ import '../../../entity/chat_session.dart';
 import '../../../state/chat_state.dart';
 import '../../../state/session_list_state.dart';
 
-class SessionList extends ConsumerWidget {
-  const SessionList(this.sessionList, {super.key});
+class ChatSessionList extends ConsumerWidget {
+  const ChatSessionList(this.sessionList, {super.key});
   final List<ChatSession> sessionList;
 
   @override
@@ -39,7 +39,7 @@ class SessionList extends ConsumerWidget {
                     fit: BoxFit.cover, // Cover fit
                   ),
                   Text(
-                    'Your Conversations',
+                    'Your Chat',
                     style: GoogleFonts.oswald(
                       textStyle: const TextStyle(
                           color: Colors.black,
@@ -66,7 +66,7 @@ class SessionList extends ConsumerWidget {
                             () {
                           Future.microtask(() => ref
                               .read(chatProvider.notifier)
-                              .setCurrentSession(sessionList[index].id));
+                              .setCurrentSession(id: sessionList[index].id));
                           Navigator.pop(context);
                         });
                       })),
