@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:ry_chat/entity/chat_message.dart';
 import 'package:uuid/uuid.dart';
 import '../../data/api/dio_manager.dart';
+import '../../state/chat_state.dart';
 import '../../state/message_list_provider.dart';
 import 'components/chat_main.dart';
 import 'components/custom_drawer.dart';
@@ -23,13 +25,19 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
   void _sendMessage() {
     if (_controller.text.isNotEmpty) {
-      ref.read(messageListProvider.notifier).addMessage(_controller.text, true);
+      // ref.read(messageListProvider.notifier).addMessage(_controller.text, true);
+      ref.read(chatProvider.notifier).addMessage(ChatMessage(
+          id: const Uuid().v1(),
+          content: _controller.text,
+          isFromAI: false,
+          temporary: false,
+          timestamp: DateTime.now()));
 
       // Create a new StreamController for the response
       final responseController = StreamController<String>.broadcast();
       ref
-          .read(messageListProvider.notifier)
-          .addStreamMessage(responseController.stream);
+          .read(chatProvider.notifier)
+          .addMessageStream(const Uuid().v1(), responseController.stream);
 
       // Fetch API response
       // fetchApiResponse(responseController, _controller.text);
