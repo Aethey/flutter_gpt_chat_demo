@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collection/collection.dart';
+import 'package:ry_chat/data/database/hive_db.dart';
 import 'package:uuid/uuid.dart';
 import '../entity/chat_message.dart';
 import '../entity/chat_session.dart';
@@ -20,6 +21,16 @@ class ChatNotifier extends StateNotifier<ChatSession> {
 
   ChatMessage? findMessageById(String id) {
     return state.messages.firstWhereOrNull((message) => message.id == id);
+  }
+
+  void setCurrentSession(String? id) async {
+    if (id == null) {
+    } else {
+      ChatSession? currentChatSession = await HiveDB.readChatSessionById(id);
+      if (currentChatSession != null) {
+        state = currentChatSession;
+      }
+    }
   }
 
   void updateMessage(String id, String content, {bool temporary = false}) {

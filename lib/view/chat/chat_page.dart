@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:ry_chat/entity/chat_message.dart';
 import 'package:uuid/uuid.dart';
 import '../../data/api/dio_manager.dart';
+import '../../data/database/hive_db.dart';
+import '../../entity/chat_session.dart';
 import '../../state/chat_state.dart';
 import '../../state/message_list_provider.dart';
+import '../../state/session_list_state.dart';
 import 'components/chat_main.dart';
-import 'components/custom_drawer.dart';
+import 'components/session_list.dart';
 import 'components/input_section.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,15 +26,17 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   final ValueNotifier<int> _buttonType = ValueNotifier<int>(0);
   final ValueNotifier<bool> _isStreaming = ValueNotifier<bool>(false);
 
-  void _sendMessage() {
+  void _sendMessage(String id) {
     if (_controller.text.isNotEmpty) {
       // ref.read(messageListProvider.notifier).addMessage(_controller.text, true);
-      ref.read(chatProvider.notifier).addMessage(ChatMessage(
+      var tmpMsg = ChatMessage(
           id: const Uuid().v1(),
           content: _controller.text,
           isFromAI: false,
           temporary: false,
-          timestamp: DateTime.now()));
+          timestamp: DateTime.now());
+      ref.read(chatProvider.notifier).addMessage(tmpMsg);
+      HiveDB.addMessageToSession(id, tmpMsg);
 
       // Create a new StreamController for the response
       final responseController = StreamController<String>.broadcast();
@@ -46,9 +51,16 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       DioManager().fetchStreamResponse(
           controller: responseController,
           userMessage: _controller.text,
-          onStreamStopCallback: () {
+          onStreamStopCallback: (totalMessage) {
             _buttonType.value = 0;
             _isStreaming.value = false;
+            var tmpMsg = ChatMessage(
+                id: const Uuid().v1(),
+                content: totalMessage,
+                isFromAI: true,
+                temporary: false,
+                timestamp: DateTime.now());
+            HiveDB.addMessageToSession(id, tmpMsg);
           });
 
       _controller.clear();
@@ -76,12 +88,16 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   void initState() {
     super.initState();
     _controller.addListener(_handleTextChange);
+    Future.microtask(
+        () => ref.read(sessionListProvider.notifier).loadSessions());
   }
 
   @override
   Widget build(BuildContext context) {
+    final sessionListSession = ref.watch(sessionListProvider);
+    final chatSession = ref.watch(chatProvider);
     return Scaffold(
-      drawer: const CustomDrawer(),
+      drawer: SessionList(sessionListSession),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Column(
@@ -127,7 +143,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                     child: InputSection(
                       buttonType: _buttonType,
                       controller: _controller,
-                      onSendMessage: () => _sendMessage(),
+                      onSendMessage: () => _sendMessage(chatSession.id),
                     ),
                   ),
                 ],

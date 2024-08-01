@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ry_chat/config_dev.dart';
 
-typedef OnStreamStopCallback = void Function();
+typedef OnStreamStopCallback = void Function(String totalMessage);
 
 class DioManager {
   String? apiKey = dotenv.env['OPENAI_API_KEY'];
@@ -103,16 +103,16 @@ class DioManager {
         controller.add(accumulatedContent.toString());
       }, onDone: () {
         controller.close();
-        onStreamStopCallback();
+        onStreamStopCallback(accumulatedContent.toString() ?? "");
       }, onError: (e) {
         controller.addError('request data failed: $e');
         controller.close();
-        onStreamStopCallback();
+        onStreamStopCallback(accumulatedContent.toString() ?? "");
       });
     } catch (e) {
       controller.addError(_handleError(e));
       controller.close();
-      onStreamStopCallback();
+      onStreamStopCallback(accumulatedContent.toString() ?? "");
     } finally {
       // process every time
       // controller.close();

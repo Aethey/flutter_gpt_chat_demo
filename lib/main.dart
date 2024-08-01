@@ -12,6 +12,7 @@ import 'package:ry_chat/data/database/hive_db.dart';
 import 'package:ry_chat/view/chat/chat_page.dart';
 import 'package:ry_chat/view/chat/components/markdown_part.dart';
 import 'package:ry_chat/view/login/login_page.dart';
+import 'package:uuid/uuid.dart';
 import 'application.dart';
 import 'firebase_options.dart';
 
