@@ -70,6 +70,7 @@ dependencies:
   cloud_firestore: ^5.1.0
   collection: ^1.18.0
   flutter_markdown: ^0.7.3
+  flutter_highlight: ^0.7.0
 #  drift: ^2.19.1+1
 #  drift_flutter: ^0.1.0
 
