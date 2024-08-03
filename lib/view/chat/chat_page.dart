@@ -3,11 +3,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ry_chat/entity/chat_message.dart';
 import 'package:uuid/uuid.dart';
-import '../../data/api/dio_manager.dart';
 import '../../data/database/hive_db.dart';
+import '../../data/repository/chat_repository.dart';
 import '../../entity/chat_session.dart';
 import '../../state/chat_state.dart';
-import '../../state/message_list_provider.dart';
 import '../../state/session_list_state.dart';
 import 'components/chat_main.dart';
 import 'components/chat_session_list.dart';
@@ -42,7 +41,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         if (_scrollController.hasClients) {
           _scrollController.animateTo(
             _scrollController.position.maxScrollExtent,
-            duration: Duration(milliseconds: 50),
+            duration: const Duration(milliseconds: 50),
             curve: Curves.easeOut,
           );
         }
@@ -58,7 +57,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       // fetchApiResponse(responseController, _controller.text);
       _buttonType.value = 2;
       _isStreaming.value = true;
-      DioManager().fetchStreamResponse(
+      ChatRepository().fetchStreamResponse(
           controller: responseController,
           userMessage: _controller.text,
           chatSession: chatSession,
@@ -84,7 +83,6 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                 timestamp: DateTime.now());
             HiveDB.addMessageToSession(chatSession.id, tmpMsg);
           });
-
       _controller.clear();
     }
   }

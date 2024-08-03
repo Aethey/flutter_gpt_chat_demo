@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:ry_chat/data/api/dio_manager.dart';
 import 'package:ry_chat/entity/chat_session.dart';
 
@@ -10,14 +8,34 @@ import '../../entity/chat_message.dart';
 
 typedef OnStreamStopCallback = void Function(String totalMessage);
 typedef OnStreamingCallback = void Function();
+typedef OnProcessing = void Function(String content);
+typedef OnProcessClose = void Function();
+typedef OnProcessError = void Function(Object error);
 
 class ChatRepository {
+  static final ChatRepository _singleton = ChatRepository._internal();
+
+  factory ChatRepository() {
+    return _singleton;
+  }
+
+  ChatRepository._internal();
+
   Future<void> fetchStreamResponse(
       {required StreamController<String> controller,
       required String userMessage,
       required ChatSession chatSession,
       required OnStreamingCallback onStreamingCallback,
-      required OnStreamStopCallback onStreamStopCallback}) async {}
+      required OnStreamStopCallback onStreamStopCallback}) async {
+    DioManager().fetchStreamResponse(
+        body: _createRequestBody(chatSession, userMessage),
+        onProcessing: (content) => {controller.add(content)},
+        onProcessClose: () => {controller.close()},
+        onProcessError: (error) =>
+            {controller.addError(error), controller.close()},
+        onStreamingCallback: onStreamingCallback,
+        onStreamStopCallback: onStreamStopCallback);
+  }
 
   List<Map<String, String>> _createHistoryMessage(
       ChatSession chatSession, String userMessage) {
