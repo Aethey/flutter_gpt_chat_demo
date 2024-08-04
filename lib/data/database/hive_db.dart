@@ -90,6 +90,10 @@ class HiveDB {
     }
   }
 
+  static Future<void> deleteSession(String sessionId) async {
+    await _box.delete(sessionId); // delete session by id
+  }
+
   static Future<void> clearSessions() async {
     await _box.clear(); // This clears all entries in the box.
   }

@@ -68,7 +68,7 @@ class ChatSessionList extends ConsumerWidget {
                               .read(chatProvider.notifier)
                               .setCurrentSession(id: sessionList[index].id));
                           Navigator.pop(context);
-                        });
+                        }, context, ref);
                       })),
           Container(
             height: 200,
@@ -79,8 +79,8 @@ class ChatSessionList extends ConsumerWidget {
     );
   }
 
-  Widget _buildConversionItem(
-      ChatSession chatSession, int index, GestureTapCallback onTap) {
+  Widget _buildConversionItem(ChatSession chatSession, int index,
+      GestureTapCallback onTap, BuildContext context, WidgetRef ref) {
     return ListTile(
       title: SizedBox(
         width: double.infinity,
@@ -103,6 +103,11 @@ class ChatSessionList extends ConsumerWidget {
         ),
       ),
       onTap: onTap,
+      onLongPress: () {
+        Future.microtask(() => ref
+            .read(sessionListProvider.notifier)
+            .deleteSession(chatSession.id));
+      },
     );
   }
 }

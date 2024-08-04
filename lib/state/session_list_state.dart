@@ -19,6 +19,11 @@ class SessionListNotifier extends StateNotifier<List<ChatSession>> {
     ];
   }
 
+  void deleteSession(String sessionId) async {
+    await HiveDB.deleteSession(sessionId); // 删除数据库中的会话
+    state = state.where((session) => session.id != sessionId).toList(); //
+  }
+
   Future<void> loadSessions() async {
     List<ChatSession> sessions = await HiveDB.readAllChatSessions();
     state = sessions; // Update state with the loaded sessions
