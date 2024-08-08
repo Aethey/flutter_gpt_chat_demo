@@ -28,6 +28,8 @@ mixin _$ChatSession {
   DateTime? get updateTimestamp => throw _privateConstructorUsedError;
   @HiveField(3)
   DateTime? get createTimestamp => throw _privateConstructorUsedError;
+  @HiveField(4)
+  String? get title => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -45,7 +47,8 @@ abstract class $ChatSessionCopyWith<$Res> {
       {@HiveField(0) String id,
       @HiveField(1) List<ChatMessage> messages,
       @HiveField(2) DateTime? updateTimestamp,
-      @HiveField(3) DateTime? createTimestamp});
+      @HiveField(3) DateTime? createTimestamp,
+      @HiveField(4) String? title});
 }
 
 /// @nodoc
@@ -65,6 +68,7 @@ class _$ChatSessionCopyWithImpl<$Res, $Val extends ChatSession>
     Object? messages = null,
     Object? updateTimestamp = freezed,
     Object? createTimestamp = freezed,
+    Object? title = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -83,6 +87,10 @@ class _$ChatSessionCopyWithImpl<$Res, $Val extends ChatSession>
           ? _value.createTimestamp
           : createTimestamp // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -99,7 +107,8 @@ abstract class _$$ChatSessionImplCopyWith<$Res>
       {@HiveField(0) String id,
       @HiveField(1) List<ChatMessage> messages,
       @HiveField(2) DateTime? updateTimestamp,
-      @HiveField(3) DateTime? createTimestamp});
+      @HiveField(3) DateTime? createTimestamp,
+      @HiveField(4) String? title});
 }
 
 /// @nodoc
@@ -117,6 +126,7 @@ class __$$ChatSessionImplCopyWithImpl<$Res>
     Object? messages = null,
     Object? updateTimestamp = freezed,
     Object? createTimestamp = freezed,
+    Object? title = freezed,
   }) {
     return _then(_$ChatSessionImpl(
       id: null == id
@@ -135,6 +145,10 @@ class __$$ChatSessionImplCopyWithImpl<$Res>
           ? _value.createTimestamp
           : createTimestamp // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -147,7 +161,8 @@ class _$ChatSessionImpl implements _ChatSession {
       {@HiveField(0) required this.id,
       @HiveField(1) required final List<ChatMessage> messages,
       @HiveField(2) this.updateTimestamp,
-      @HiveField(3) this.createTimestamp})
+      @HiveField(3) this.createTimestamp,
+      @HiveField(4) this.title})
       : _messages = messages;
 
   factory _$ChatSessionImpl.fromJson(Map<String, dynamic> json) =>
@@ -171,10 +186,13 @@ class _$ChatSessionImpl implements _ChatSession {
   @override
   @HiveField(3)
   final DateTime? createTimestamp;
+  @override
+  @HiveField(4)
+  final String? title;
 
   @override
   String toString() {
-    return 'ChatSession(id: $id, messages: $messages, updateTimestamp: $updateTimestamp, createTimestamp: $createTimestamp)';
+    return 'ChatSession(id: $id, messages: $messages, updateTimestamp: $updateTimestamp, createTimestamp: $createTimestamp, title: $title)';
   }
 
   @override
@@ -187,7 +205,8 @@ class _$ChatSessionImpl implements _ChatSession {
             (identical(other.updateTimestamp, updateTimestamp) ||
                 other.updateTimestamp == updateTimestamp) &&
             (identical(other.createTimestamp, createTimestamp) ||
-                other.createTimestamp == createTimestamp));
+                other.createTimestamp == createTimestamp) &&
+            (identical(other.title, title) || other.title == title));
   }
 
   @JsonKey(ignore: true)
@@ -197,7 +216,8 @@ class _$ChatSessionImpl implements _ChatSession {
       id,
       const DeepCollectionEquality().hash(_messages),
       updateTimestamp,
-      createTimestamp);
+      createTimestamp,
+      title);
 
   @JsonKey(ignore: true)
   @override
@@ -218,7 +238,8 @@ abstract class _ChatSession implements ChatSession {
       {@HiveField(0) required final String id,
       @HiveField(1) required final List<ChatMessage> messages,
       @HiveField(2) final DateTime? updateTimestamp,
-      @HiveField(3) final DateTime? createTimestamp}) = _$ChatSessionImpl;
+      @HiveField(3) final DateTime? createTimestamp,
+      @HiveField(4) final String? title}) = _$ChatSessionImpl;
 
   factory _ChatSession.fromJson(Map<String, dynamic> json) =
       _$ChatSessionImpl.fromJson;
@@ -235,6 +256,9 @@ abstract class _ChatSession implements ChatSession {
   @override
   @HiveField(3)
   DateTime? get createTimestamp;
+  @override
+  @HiveField(4)
+  String? get title;
   @override
   @JsonKey(ignore: true)
   _$$ChatSessionImplCopyWith<_$ChatSessionImpl> get copyWith =>

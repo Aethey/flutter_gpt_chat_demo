@@ -42,11 +42,21 @@ class DioManager {
   }
 
   // Regular API call common
-  Future<Response> fetchRegularResponse(String path,
-      {Map<String, dynamic>? data}) async {
+  Future<void> fetchRegularResponse(
+      {String? path,
+      Map<String, dynamic>? body,
+      required OnUpdateSessionTitle onUpdateSessionTitle}) async {
+    Options options = Options(headers: {
+      'Authorization': 'Bearer $apiKey',
+      'Content-Type': 'application/json',
+    });
     try {
-      final response = await _dio.post(path, data: data);
-      return response;
+      final response = await _dio.post(
+        '/v1/chat/completions',
+        data: jsonEncode(body),
+        options: options,
+      );
+      onUpdateSessionTitle(response.data['choices'][0]['message']['content']);
     } catch (e) {
       throw _handleError(e);
     }

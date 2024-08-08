@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ry_chat/entity/chat_message.dart';
 import 'package:uuid/uuid.dart';
 import '../../data/database/hive_db.dart';
-import '../../data/repository/chat_repository.dart';
 import '../../entity/chat_session.dart';
 import '../../state/chat_state.dart';
 import '../../state/session_list_state.dart';
@@ -28,15 +28,10 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
   void _sendMessage(ChatSession chatSession) {
     if (_controller.text.isNotEmpty) {
-      // ref.read(messageListProvider.notifier).addMessage(_controller.text, true);
-      var tmpMsg = ChatMessage(
-          id: const Uuid().v1(),
-          content: _controller.text,
-          isFromAI: false,
-          temporary: false,
-          timestamp: DateTime.now());
-      ref.read(chatProvider.notifier).addMessage(tmpMsg);
-      HiveDB.addMessageToSession(chatSession.id, tmpMsg);
+      ref
+          .read(chatProvider.notifier)
+          .addMessage(messageText: _controller.text, sessionID: chatSession.id);
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scrollController.hasClients) {
           _scrollController.animateTo(
@@ -54,10 +49,15 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           .addMessageStream(const Uuid().v1(), responseController.stream);
 
       // Fetch API response
-      // fetchApiResponse(responseController, _controller.text);
       _buttonType.value = 2;
       _isStreaming.value = true;
-      ChatRepository().fetchStreamResponse(
+      if (chatSession.messages.isEmpty) {
+        ref
+            .read(chatProvider.notifier)
+            .generationSessionTitle(_controller.text, chatSession);
+      }
+
+      ref.read(chatProvider.notifier).sendMessage(
           controller: responseController,
           userMessage: _controller.text,
           chatSession: chatSession,
@@ -72,16 +72,9 @@ class _ChatPageState extends ConsumerState<ChatPage> {
               }
             });
           },
-          onStreamStopCallback: (totalMessage) {
+          onStreamStopWidgetCallback: () {
             _buttonType.value = 0;
             _isStreaming.value = false;
-            var tmpMsg = ChatMessage(
-                id: const Uuid().v1(),
-                content: totalMessage,
-                isFromAI: true,
-                temporary: false,
-                timestamp: DateTime.now());
-            HiveDB.addMessageToSession(chatSession.id, tmpMsg);
           });
       _controller.clear();
     }
@@ -144,21 +137,25 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                                     MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/icons/chatbot.png',
-                                        width: 48, // Image width
-                                        height: 48, // Image height
-                                        fit: BoxFit.cover, // Cover fit
-                                        key: const ValueKey('text'),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      const Text(
-                                        "Joi",
-                                        style: TextStyle(color: Colors.black),
-                                      )
-                                    ],
+                                  SizedBox(
+                                    width: 1.sw * 2 / 3,
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          'assets/icons/chatbot.png',
+                                          width: 40, // Image width
+                                          height: 40, // Image height
+                                          fit: BoxFit.cover, // Cover fit
+                                          key: const ValueKey('text'),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          chatSession.title ?? "default title",
+                                          style: const TextStyle(
+                                              color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   chatSession.messages.isNotEmpty
                                       ? GestureDetector(

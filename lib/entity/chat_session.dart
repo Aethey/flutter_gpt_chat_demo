@@ -13,6 +13,7 @@ class ChatSession with _$ChatSession {
     @HiveField(1) required List<ChatMessage> messages,
     @HiveField(2) DateTime? updateTimestamp,
     @HiveField(3) DateTime? createTimestamp,
+    @HiveField(4) String? title,
   }) = _ChatSession;
 
   factory ChatSession.fromJson(Map<String, dynamic> json) =>

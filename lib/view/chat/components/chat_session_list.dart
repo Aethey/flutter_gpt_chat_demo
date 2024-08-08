@@ -93,7 +93,7 @@ class ChatSessionList extends ConsumerWidget {
             const SizedBox(width: 12), // Add space between items
             Expanded(
               child: Text(
-                chatSession.messages[0].content ?? "",
+                chatSession.title ?? chatSession.messages[0].content ?? "",
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 softWrap: false,

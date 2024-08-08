@@ -21,19 +21,22 @@ class ChatSessionAdapter extends TypeAdapter<_$ChatSessionImpl> {
       messages: (fields[1] as List).cast<ChatMessage>(),
       updateTimestamp: fields[2] as DateTime?,
       createTimestamp: fields[3] as DateTime?,
+      title: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, _$ChatSessionImpl obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(2)
       ..write(obj.updateTimestamp)
       ..writeByte(3)
       ..write(obj.createTimestamp)
+      ..writeByte(4)
+      ..write(obj.title)
       ..writeByte(1)
       ..write(obj.messages);
   }
@@ -65,6 +68,7 @@ _$ChatSessionImpl _$$ChatSessionImplFromJson(Map<String, dynamic> json) =>
       createTimestamp: json['createTimestamp'] == null
           ? null
           : DateTime.parse(json['createTimestamp'] as String),
+      title: json['title'] as String?,
     );
 
 Map<String, dynamic> _$$ChatSessionImplToJson(_$ChatSessionImpl instance) =>
@@ -73,4 +77,5 @@ Map<String, dynamic> _$$ChatSessionImplToJson(_$ChatSessionImpl instance) =>
       'messages': instance.messages,
       'updateTimestamp': instance.updateTimestamp?.toIso8601String(),
       'createTimestamp': instance.createTimestamp?.toIso8601String(),
+      'title': instance.title,
     };

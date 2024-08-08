@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:ry_chat/data/api/dio_manager.dart';
 import 'package:ry_chat/entity/chat_session.dart';
@@ -11,6 +12,8 @@ typedef OnStreamingCallback = void Function();
 typedef OnProcessing = void Function(String content);
 typedef OnProcessClose = void Function();
 typedef OnProcessError = void Function(Object error);
+typedef OnUpdateSessionTitle = void Function(String sessionTitle);
+typedef OnStreamStopWidgetCallback = void Function();
 
 class ChatRepository {
   static final ChatRepository _singleton = ChatRepository._internal();
@@ -21,6 +24,24 @@ class ChatRepository {
 
   ChatRepository._internal();
 
+  Future<void> generateSessionTitle({
+    required String userMessage,
+    required ChatSession chatSession,
+    required OnUpdateSessionTitle onUpdateSessionTitle,
+  }) async {
+    String tmp = "this is first message from user and "
+        "you will give an answer,you analysis there info then named this chat return the name to me, just give me the name without anymore"
+        "and this is first message $userMessage";
+    DioManager().fetchRegularResponse(
+        body: _createRequestBody(
+            chatSession,
+            [
+              {"role": "user", "content": tmp}
+            ],
+            false),
+        onUpdateSessionTitle: onUpdateSessionTitle);
+  }
+
   Future<void> fetchStreamResponse(
       {required StreamController<String> controller,
       required String userMessage,
@@ -28,7 +49,8 @@ class ChatRepository {
       required OnStreamingCallback onStreamingCallback,
       required OnStreamStopCallback onStreamStopCallback}) async {
     DioManager().fetchStreamResponse(
-        body: _createRequestBody(chatSession, userMessage),
+        body: _createRequestBody(
+            chatSession, _createHistoryMessage(chatSession, userMessage), true),
         onProcessing: (content) => {controller.add(content)},
         onProcessClose: () => {controller.close()},
         onProcessError: (error) =>
@@ -57,11 +79,11 @@ class ChatRepository {
   }
 
   Map<String, dynamic> _createRequestBody(
-      ChatSession chatSession, String userMessage) {
+      ChatSession chatSession, List<Map<String, String>> body, bool isStream) {
     return {
       "model": AppConfig.commonModel,
-      "messages": _createHistoryMessage(chatSession, userMessage),
-      "stream": true
+      "messages": body,
+      "stream": isStream
     };
   }
 }
