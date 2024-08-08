@@ -1,11 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 import '../../../entity/chat_session.dart';
 import '../../../state/chat_state.dart';
 import '../../../state/session_list_state.dart';
+
+typedef OnItemClick = void Function();
 
 class ChatSessionList extends ConsumerWidget {
   const ChatSessionList(this.sessionList, {super.key});
@@ -15,7 +18,10 @@ class ChatSessionList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     Future.microtask(
         () => ref.read(sessionListProvider.notifier).loadSessions());
-    return Drawer(
+    return Container(
+      color: Colors.white,
+      width: 1.sw / 2,
+      height: 1.sh,
       child: Column(
         children: <Widget>[
           SizedBox(
@@ -71,7 +77,21 @@ class ChatSessionList extends ConsumerWidget {
                         }, context, ref);
                       })),
           Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(8.0),
             height: 200,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildMenuItem('assets/icons/broom.png', () {
+                  Future.microtask(() =>
+                      ref.read(sessionListProvider.notifier).clearSessions());
+                }, "clear all"),
+                _buildMenuItem('assets/icons/resume.png', () {}, "edit prompt"),
+                _buildMenuItem('assets/icons/setting.png', () {}, "setting"),
+              ],
+            ),
           )
           // Add more list tiles for more users
         ],
@@ -79,35 +99,95 @@ class ChatSessionList extends ConsumerWidget {
     );
   }
 
-  Widget _buildConversionItem(ChatSession chatSession, int index,
-      GestureTapCallback onTap, BuildContext context, WidgetRef ref) {
-    return ListTile(
-      title: SizedBox(
+  Widget _buildMenuItem(
+      String iconPath, OnItemClick onItemClick, String title) {
+    return Expanded(
+      child: Row(
+        children: [
+          SizedBox(
+            height: 36,
+            child: GestureDetector(
+              onTap: onItemClick,
+              child: SizedBox(
+                height: 10,
+                width: 45,
+                child: Image.asset(
+                  iconPath,
+                  fit: BoxFit.contain, // Cover fit
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            width: 12,
+          ),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.black),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConversionItem(
+    ChatSession chatSession,
+    int index,
+    GestureTapCallback onTap,
+    BuildContext context,
+    WidgetRef ref,
+  ) {
+    String formattedDate =
+        DateFormat('yyyy-MM-dd').format(sessionList[index].updateTimestamp!);
+    bool showHeader = index == 0 ||
+        formattedDate !=
+            DateFormat('yyyy-MM-dd')
+                .format(sessionList[index - 1].updateTimestamp!);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: SizedBox(
         width: double.infinity,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.ac_unit),
-            const SizedBox(width: 4), // Add space between items
-            Text("chat$index"),
-            const SizedBox(width: 12), // Add space between items
-            Expanded(
-              child: Text(
-                chatSession.title ?? chatSession.messages[0].content ?? "",
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                softWrap: false,
+            if (showHeader)
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                // color: Colors.grey[300],
+                child: Text(formattedDate,
+                    style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black)),
+              ),
+            GestureDetector(
+              onTap: onTap,
+              onLongPress: () {
+                Future.microtask(() => ref
+                    .read(sessionListProvider.notifier)
+                    .deleteSession(chatSession.id));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  // const Icon(Icons.ac_unit),
+                  const SizedBox(width: 12), // Add space between items
+                  Expanded(
+                    child: Text(
+                      chatSession.title ?? chatSession.messages[0].content,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      softWrap: false,
+                      style: const TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
-      onTap: onTap,
-      onLongPress: () {
-        Future.microtask(() => ref
-            .read(sessionListProvider.notifier)
-            .deleteSession(chatSession.id));
-      },
     );
   }
 }

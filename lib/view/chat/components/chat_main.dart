@@ -12,7 +12,6 @@ class ChatList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chatSession = ref.watch(chatProvider);
-    final ScrollController _scrollController = ScrollController();
 
     return ListView.builder(
       controller: scrollController,
