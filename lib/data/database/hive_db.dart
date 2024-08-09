@@ -1,7 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:ry_chat/entity/chat_message.dart';
 import 'package:ry_chat/entity/chat_session.dart';
-import 'dart:collection';
 import '../../config_dev.dart';
 
 class HiveDB {
@@ -49,13 +48,12 @@ class HiveDB {
 
   static Future<List<ChatSession>> readAllChatSessions() async {
     List<ChatSession> sessions = [];
-    DateTime defaultTime = DateTime.now().subtract(Duration(days: 1));
     for (var key in _box.keys) {
       var session = _box.get(key) as ChatSession?;
       if (session != null) {
         session = session.updateTimestamp != null
             ? session
-            : session.copyWith(updateTimestamp: defaultTime);
+            : session.copyWith(updateTimestamp: DateTime.now());
         sessions.add(session);
       }
     }
@@ -86,7 +84,6 @@ class HiveDB {
             DateTime.now(), // Start with the new message as the first message
       );
       await _box.put(sessionId, newSession);
-      print('New session created with ID $sessionId');
     }
   }
 
