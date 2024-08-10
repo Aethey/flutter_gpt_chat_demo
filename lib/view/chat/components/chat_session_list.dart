@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:ry_chat/app_utils.dart';
 
 import '../../../entity/chat_session.dart';
 import '../../../state/chat_state.dart';
@@ -16,8 +17,7 @@ class ChatSessionList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Future.microtask(
-        () => ref.read(sessionListProvider.notifier).loadSessions());
+    ref.read(sessionListProvider.notifier).loadSessions();
     return Container(
       color: Colors.white,
       width: 1.sw / 2,
@@ -70,9 +70,9 @@ class ChatSessionList extends ConsumerWidget {
                       itemBuilder: (context, index) {
                         return _buildConversionItem(sessionList[index], index,
                             () {
-                          Future.microtask(() => ref
+                          ref
                               .read(chatProvider.notifier)
-                              .setCurrentSession(id: sessionList[index].id));
+                              .setCurrentSession(id: sessionList[index].id);
                           Navigator.pop(context);
                         }, context, ref);
                       })),
@@ -84,9 +84,21 @@ class ChatSessionList extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Wrap(
+                  spacing: 8.0, // 水平间距
+                  runSpacing: 4.0, // 垂直间距
+                  children: [
+                    _buildFilterItem("Today"),
+                    _buildFilterItem("2days-ago"),
+                    _buildFilterItem("Last-week"),
+                    _buildFilterItem("Earlier"),
+                  ],
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
                 _buildMenuItem('assets/icons/broom.png', () {
-                  Future.microtask(() =>
-                      ref.read(sessionListProvider.notifier).clearSessions());
+                  ref.read(sessionListProvider.notifier).clearSessions();
                 }, "clear all"),
                 _buildMenuItem('assets/icons/resume.png', () {}, "edit prompt"),
                 _buildMenuItem('assets/icons/setting.png', () {}, "setting"),
@@ -95,6 +107,24 @@ class ChatSessionList extends ConsumerWidget {
           )
           // Add more list tiles for more users
         ],
+      ),
+    );
+  }
+
+  Widget _buildFilterItem(String text) {
+    return Container(
+      padding: const EdgeInsets.all(4.0),
+      decoration: BoxDecoration(
+        // color: Colors.grey[300],
+        border: Border.all(
+          color: Colors.black,
+          width: 1.0,
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.black, fontSize: 12),
       ),
     );
   }
@@ -143,9 +173,13 @@ class ChatSessionList extends ConsumerWidget {
         formattedDate !=
             DateFormat('yyyy-MM-dd')
                 .format(sessionList[index - 1].updateTimestamp!);
+    if (showHeader) {
+      String dateTip = AppUtils.instance
+          .formatDateRelativeToToday(sessionList[index].updateTimestamp!);
+    }
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: SizedBox(
         width: double.infinity,
         child: Column(
@@ -164,9 +198,9 @@ class ChatSessionList extends ConsumerWidget {
             GestureDetector(
               onTap: onTap,
               onLongPress: () {
-                Future.microtask(() => ref
+                ref
                     .read(sessionListProvider.notifier)
-                    .deleteSession(chatSession.id));
+                    .deleteSession(chatSession.id);
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,

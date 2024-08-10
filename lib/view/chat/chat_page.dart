@@ -102,8 +102,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   void initState() {
     super.initState();
     _controller.addListener(_handleTextChange);
-    Future.microtask(
-        () => ref.read(sessionListProvider.notifier).loadSessions());
+    ref.read(sessionListProvider.notifier).loadSessions();
   }
 
   @override
@@ -171,9 +170,9 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                                             ),
                                           ),
                                           onTap: () {
-                                            Future.microtask(() => ref
+                                            ref
                                                 .read(chatProvider.notifier)
-                                                .setCurrentSession());
+                                                .setCurrentSession();
                                           },
                                         )
                                       : Container()
