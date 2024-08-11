@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,19 +7,31 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:ry_chat/app_utils.dart';
 
+import '../../../config_dev.dart';
 import '../../../entity/chat_session.dart';
 import '../../../state/chat_state.dart';
 import '../../../state/session_list_state.dart';
+import 'filter_tags.dart';
 
 typedef OnItemClick = void Function();
 
-class ChatSessionList extends ConsumerWidget {
+class ChatSessionList extends ConsumerStatefulWidget {
   const ChatSessionList(this.sessionList, {super.key});
+
   final List<ChatSession> sessionList;
+  @override
+  ChatSessionListState createState() => ChatSessionListState();
+}
+
+class ChatSessionListState extends ConsumerState<ChatSessionList> {
+  @override
+  void initState() {
+    ref.read(sessionListProvider.notifier).loadSessions();
+    super.initState();
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.read(sessionListProvider.notifier).loadSessions();
+  Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
       width: 1.sw / 2,
@@ -58,7 +72,7 @@ class ChatSessionList extends ConsumerWidget {
             ),
           ),
           Expanded(
-              child: sessionList.isEmpty
+              child: widget.sessionList.isEmpty
                   ? const Center(
                       child: Text(
                         "No chats available",
@@ -66,13 +80,12 @@ class ChatSessionList extends ConsumerWidget {
                       ),
                     )
                   : ListView.builder(
-                      itemCount: sessionList.length,
+                      itemCount: widget.sessionList.length,
                       itemBuilder: (context, index) {
-                        return _buildConversionItem(sessionList[index], index,
-                            () {
-                          ref
-                              .read(chatProvider.notifier)
-                              .setCurrentSession(id: sessionList[index].id);
+                        return _buildConversionItem(
+                            widget.sessionList[index], index, () {
+                          ref.read(chatProvider.notifier).setCurrentSession(
+                              id: widget.sessionList[index].id);
                           Navigator.pop(context);
                         }, context, ref);
                       })),
@@ -84,15 +97,19 @@ class ChatSessionList extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Wrap(
-                  spacing: 8.0, // 水平间距
-                  runSpacing: 4.0, // 垂直间距
-                  children: [
-                    _buildFilterItem("Today"),
-                    _buildFilterItem("2days-ago"),
-                    _buildFilterItem("Last-week"),
-                    _buildFilterItem("Earlier"),
-                  ],
+                FilterTags(
+                  onSelectionChanged: (selectedTags) {
+                    if (selectedTags.isNotEmpty) {
+                      ref
+                          .read(sessionListProvider.notifier)
+                          .filterSessionsByDateLabel(
+                              AppConfig.filterMap[selectedTags.reduce(max)]!);
+                    } else {
+                      ref
+                          .read(sessionListProvider.notifier)
+                          .filterSessionsByDateLabel("all");
+                    }
+                  },
                 ),
                 const SizedBox(
                   height: 12,
@@ -107,24 +124,6 @@ class ChatSessionList extends ConsumerWidget {
           )
           // Add more list tiles for more users
         ],
-      ),
-    );
-  }
-
-  Widget _buildFilterItem(String text) {
-    return Container(
-      padding: const EdgeInsets.all(4.0),
-      decoration: BoxDecoration(
-        // color: Colors.grey[300],
-        border: Border.all(
-          color: Colors.black,
-          width: 1.0,
-        ),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(color: Colors.black, fontSize: 12),
       ),
     );
   }
@@ -167,15 +166,15 @@ class ChatSessionList extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) {
-    String formattedDate =
-        DateFormat('yyyy-MM-dd').format(sessionList[index].updateTimestamp!);
+    String formattedDate = DateFormat('yyyy-MM-dd')
+        .format(widget.sessionList[index].updateTimestamp!);
     bool showHeader = index == 0 ||
         formattedDate !=
             DateFormat('yyyy-MM-dd')
-                .format(sessionList[index - 1].updateTimestamp!);
+                .format(widget.sessionList[index - 1].updateTimestamp!);
     if (showHeader) {
-      String dateTip = AppUtils.instance
-          .formatDateRelativeToToday(sessionList[index].updateTimestamp!);
+      String dateTip = AppUtils.instance.formatDateRelativeToToday(
+          widget.sessionList[index].updateTimestamp!);
     }
 
     return Container(

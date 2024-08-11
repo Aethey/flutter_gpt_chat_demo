@@ -27,4 +27,38 @@ class AppUtils {
       return 'Earlier';
     }
   }
+
+  Map<String, DateTime> getDateRangeForLabel(String label) {
+    final now = DateTime.now();
+    DateTime startDate;
+    DateTime endDate =
+        DateTime(now.year, now.month, now.day, 23, 59, 59); // end of the day
+
+    switch (label) {
+      case "Today":
+        startDate = DateTime(now.year, now.month, now.day);
+        break;
+      case "2 days ago":
+        startDate =
+            DateTime(now.year, now.month, now.day).subtract(Duration(days: 7));
+        endDate =
+            DateTime(now.year, now.month, now.day).subtract(Duration(days: 2));
+        break;
+      case "Last week":
+        startDate =
+            DateTime(now.year, now.month, now.day).subtract(Duration(days: 30));
+        endDate =
+            DateTime(now.year, now.month, now.day).subtract(Duration(days: 7));
+        break;
+      case "Earlier":
+        startDate = DateTime(2000, 1, 1); // Arbitrary old date for "Earlier"
+        endDate =
+            DateTime(now.year, now.month, now.day).subtract(Duration(days: 30));
+        break;
+      default:
+        startDate = now; // Default to today if nothing matches
+        break;
+    }
+    return {'startDate': startDate, 'endDate': endDate};
+  }
 }

@@ -12,4 +12,11 @@ class AppConfig {
   static String commonModel = "gpt-4o-mini";
   static String highModel = "gpt-4o-mini";
   static int schemaVersion = 1;
+
+  static Map<int, String> filterMap = {
+    0: "Today",
+    1: "2 days ago",
+    2: "Last week",
+    3: "Earlier"
+  };
 }
