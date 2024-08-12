@@ -1,14 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:ry_chat/data/database/hive_db.dart';
 
 import '../app_utils.dart';
 import '../entity/chat_session.dart';
-
-// final sessionListProvider =
-//     StateNotifierProvider<SessionListNotifier, List<ChatSession>>((ref) {
-//   return SessionListNotifier();
-// });
 
 final sessionListProvider =
     StateNotifierProvider.autoDispose<SessionListNotifier, List<ChatSession>>(
@@ -27,7 +21,7 @@ class SessionListNotifier extends StateNotifier<List<ChatSession>> {
   }
 
   void deleteSession(String sessionId) async {
-    await HiveDB.deleteSession(sessionId); // 删除数据库中的会话
+    await HiveDB.deleteSession(sessionId); // delete session
     state = state.where((session) => session.id != sessionId).toList(); //
   }
 

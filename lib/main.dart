@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -10,9 +8,6 @@ import 'package:ry_chat/routes/main_routes.dart';
 import 'package:ry_chat/data/api/dio_manager.dart';
 import 'package:ry_chat/data/database/hive_db.dart';
 import 'package:ry_chat/view/chat/chat_page.dart';
-import 'package:ry_chat/view/chat/components/markdown_part.dart';
-import 'package:ry_chat/view/login/login_page.dart';
-import 'package:uuid/uuid.dart';
 import 'application.dart';
 import 'firebase_options.dart';
 
@@ -49,12 +44,10 @@ class MyApp extends StatelessWidget {
       designSize: const Size(360, 690),
       minTextAdapt: true,
       splitScreenMode: true,
-      // Use builder only if you need to use library outside ScreenUtilInit context
       builder: (_, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'First Method',
-          // You can use the library anywhere in the app even in theme
+          title: 'AIChat Demo',
           theme: ThemeData(
             primarySwatch: Colors.blue,
             primaryColor: Colors.black,
@@ -63,7 +56,7 @@ class MyApp extends StatelessWidget {
           home: child,
         );
       },
-      child: ChatPage(),
+      child: const ChatPage(),
     );
   }
 }
