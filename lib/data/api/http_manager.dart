@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -46,7 +47,9 @@ Future<void> fetchApiResponse(
             (dataLine) {
               if (dataLine.isEmpty || dataLine == 'data: [DONE]') {
                 // controller.close();
-                print("DONE");
+                if (kDebugMode) {
+                  print("DONE");
+                }
                 return;
               }
 
@@ -55,7 +58,9 @@ Future<void> fetchApiResponse(
 
               if (data['choices'][0]['finish_reason'] == 'stop') {
                 // controller.close();
-                print("stop");
+                if (kDebugMode) {
+                  print("stop");
+                }
                 return;
               }
 

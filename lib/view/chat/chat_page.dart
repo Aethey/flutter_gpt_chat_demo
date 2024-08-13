@@ -147,7 +147,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                                         ),
                                         const SizedBox(width: 12),
                                         Text(
-                                          chatSession.title ?? "default title",
+                                          chatSession.title ?? "new chat",
                                           style: const TextStyle(
                                               color: Colors.black),
                                         ),

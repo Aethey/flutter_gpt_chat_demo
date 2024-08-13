@@ -6,6 +6,7 @@ import 'package:ry_chat/entity/chat_session.dart';
 
 import '../../config_dev.dart';
 import '../../entity/chat_message.dart';
+import '../../prompt.dart';
 
 typedef OnStreamStopCallback = void Function(String totalMessage);
 typedef OnStreamingCallback = void Function();
@@ -66,7 +67,11 @@ class ChatRepository {
         List<ChatMessage>.from(chatSession.messages ?? []);
     allMessages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     int messagesCount = allMessages.length; // chat history count
-// if not 10
+
+    // Check if it's the first interaction
+    bool isFirstInteraction = messagesCount == 0;
+
+    // Default prompt for the first interaction
     List<Map<String, String>> historyMessages = allMessages
         .sublist(0,
             messagesCount < maxHistoryCount ? messagesCount : maxHistoryCount)
@@ -74,7 +79,16 @@ class ChatRepository {
         .map((m) {
       return {"role": m.isFromAI ? "assistant" : "user", "content": m.content};
     }).toList();
+
+    // Add the user message
     historyMessages.add({"role": "user", "content": userMessage});
+
+    // Add the default prompt if it's the first interaction
+    if (isFirstInteraction) {
+      historyMessages
+          .insert(0, {"role": "assistant", "content": defaultPrompt});
+    }
+
     return historyMessages;
   }
 
