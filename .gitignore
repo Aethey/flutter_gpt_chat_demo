@@ -50,3 +50,4 @@ app.*.map.json
 /ios/Runner/GoogleService-Info.plist
 /firebase.json
 /lib/firebase_options.dart
+/ios/Podfile.lock
