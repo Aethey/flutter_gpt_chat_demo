@@ -116,9 +116,9 @@ class ChatSessionListState extends ConsumerState<ChatSessionList> {
                 ),
                 _buildMenuItem('assets/icons/broom.png', () {
                   ref.read(sessionListProvider.notifier).clearSessions();
-                }, "clear all"),
-                _buildMenuItem('assets/icons/resume.png', () {}, "edit prompt"),
-                _buildMenuItem('assets/icons/setting.png', () {}, "setting"),
+                }, "clear history"),
+                // _buildMenuItem('assets/icons/resume.png', () {}, "edit prompt"),
+                // _buildMenuItem('assets/icons/setting.png', () {}, "setting"),
               ],
             ),
           )
@@ -134,12 +134,12 @@ class ChatSessionListState extends ConsumerState<ChatSessionList> {
       child: Row(
         children: [
           SizedBox(
-            height: 36,
+            height: 24,
             child: GestureDetector(
               onTap: onItemClick,
               child: SizedBox(
                 height: 10,
-                width: 45,
+                width: 30,
                 child: Image.asset(
                   iconPath,
                   fit: BoxFit.contain, // Cover fit
@@ -148,7 +148,7 @@ class ChatSessionListState extends ConsumerState<ChatSessionList> {
             ),
           ),
           const SizedBox(
-            width: 12,
+            width: 6,
           ),
           Text(
             title,

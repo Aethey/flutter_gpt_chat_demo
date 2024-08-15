@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:ry_chat/view/chat/components/toggle_button.dart';
 import 'custom_text_field.dart';
 
@@ -26,28 +27,58 @@ class InputSection extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
         child: Container(
-          height: 80,
-          color: Colors.white
-              .withOpacity(0.6), // Semi-transparent white background
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              const MenuButton(),
-              Expanded(
-                child: CustomTextField(
-                  buttonType: buttonType,
-                  controller: controller,
-                ),
-              ),
-              ToggleButton(
-                buttonType: buttonType,
-                onSendMessage: onSendMessage,
-              ),
-            ],
+            height: 80,
+            color: Colors.white
+                .withOpacity(0.6), // Semi-transparent white background
+            padding: const EdgeInsets.all(8.0),
+            child: ValueListenableBuilder<int>(
+                valueListenable: buttonType,
+                builder: (context, buttonType, child) {
+                  return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return ScaleTransition(scale: animation, child: child);
+                      },
+                      child: () {
+                        switch (buttonType) {
+                          case 0:
+                          case 1:
+                            return _buildBottomWidget();
+                          case 2:
+                            return Center(
+                              child: SizedBox(
+                                height: 25,
+                                child: LoadingAnimationWidget.waveDots(
+                                  color: Colors.black,
+                                  size: 60,
+                                ),
+                              ),
+                            );
+                        }
+                        return Container();
+                      }());
+                })),
+      ),
+    );
+  }
+
+  Widget _buildBottomWidget() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        const MenuButton(),
+        Expanded(
+          child: CustomTextField(
+            buttonType: buttonType,
+            controller: controller,
           ),
         ),
-      ),
+        ToggleButton(
+          buttonType: buttonType,
+          onSendMessage: onSendMessage,
+        ),
+      ],
     );
   }
 }

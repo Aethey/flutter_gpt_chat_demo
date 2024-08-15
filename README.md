@@ -4,7 +4,13 @@
 **how to build it**:  
 create a **.env** file in **root directory** with **OPENAI_API_KEY=your apiKey**
 
+## Screenshots
+
+|                                     |                                     |                                     |
+|:-----------------------------------:|:-----------------------------------:|:-----------------------------------:|
+| ![Image 1](assets/screenshot/1.png) | ![Image 2](assets/screenshot/2.png) | ![Image 3](assets/screenshot/3.png) |
 
 
 
-[Screen_recording_20240805.webm](https://github.com/user-attachments/assets/0cde77c9-820c-4132-a9f1-2df751a0516a)
+
+

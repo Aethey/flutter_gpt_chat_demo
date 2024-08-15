@@ -127,8 +127,8 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                         child: BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                             child: Container(
-                              padding: const EdgeInsets.only(left: 16),
-                              height: 80,
+                              padding: const EdgeInsets.only(left: 8),
+                              height: 50,
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -139,15 +139,15 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                                     child: Row(
                                       children: [
                                         Image.asset(
-                                          'assets/icons/chatbot.png',
-                                          width: 40, // Image width
-                                          height: 40, // Image height
+                                          'assets/icons/robot1.png',
+                                          width: 45, // Image width
+                                          height: 45, // Image height
                                           fit: BoxFit.cover, // Cover fit
                                           key: const ValueKey('text'),
                                         ),
-                                        const SizedBox(width: 12),
+                                        const SizedBox(width: 4),
                                         Text(
-                                          chatSession.title ?? "new chat",
+                                          chatSession.title ?? "New Chat",
                                           style: const TextStyle(
                                               color: Colors.black),
                                         ),
