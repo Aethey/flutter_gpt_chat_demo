@@ -33,7 +33,7 @@ class InputSection extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: ValueListenableBuilder<int>(
                 valueListenable: buttonType,
-                builder: (context, buttonType, child) {
+                builder: (context, type, child) {
                   return AnimatedSwitcher(
                       duration: const Duration(milliseconds: 500),
                       transitionBuilder:
@@ -41,10 +41,25 @@ class InputSection extends StatelessWidget {
                         return ScaleTransition(scale: animation, child: child);
                       },
                       child: () {
-                        switch (buttonType) {
+                        switch (type) {
                           case 0:
                           case 1:
-                            return _buildBottomWidget();
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                const MenuButton(),
+                                Expanded(
+                                  child: CustomTextField(
+                                    buttonType: buttonType,
+                                    controller: controller,
+                                  ),
+                                ),
+                                ToggleButton(
+                                  buttonType: buttonType,
+                                  onSendMessage: onSendMessage,
+                                ),
+                              ],
+                            );
                           case 2:
                             return Center(
                               child: SizedBox(
@@ -60,25 +75,6 @@ class InputSection extends StatelessWidget {
                       }());
                 })),
       ),
-    );
-  }
-
-  Widget _buildBottomWidget() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        const MenuButton(),
-        Expanded(
-          child: CustomTextField(
-            buttonType: buttonType,
-            controller: controller,
-          ),
-        ),
-        ToggleButton(
-          buttonType: buttonType,
-          onSendMessage: onSendMessage,
-        ),
-      ],
     );
   }
 }

@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
-import 'package:ry_chat/app_utils.dart';
 
 import '../../../config_dev.dart';
 import '../../../entity/chat_session.dart';
 import '../../../state/chat_state.dart';
 import '../../../state/session_list_state.dart';
+import 'conversion_item_widget.dart';
 import 'filter_tags.dart';
+import 'menu_item_widget.dart';
 
 typedef OnItemClick = void Function();
 
@@ -82,12 +82,19 @@ class ChatSessionListState extends ConsumerState<ChatSessionList> {
                   : ListView.builder(
                       itemCount: widget.sessionList.length,
                       itemBuilder: (context, index) {
-                        return _buildConversionItem(
-                            widget.sessionList[index], index, () {
-                          ref.read(chatProvider.notifier).setCurrentSession(
-                              id: widget.sessionList[index].id);
-                          Navigator.pop(context);
-                        }, context, ref);
+                        return ConversionItemWidget(
+                            index: index,
+                            onTap: () {
+                              ref.read(chatProvider.notifier).setCurrentSession(
+                                  id: widget.sessionList[index].id);
+                              Navigator.pop(context);
+                            },
+                            onLongPress: () {
+                              ref
+                                  .read(sessionListProvider.notifier)
+                                  .deleteSession(widget.sessionList[index].id);
+                            },
+                            sessionList: widget.sessionList);
                       })),
           Container(
             width: double.infinity,
@@ -114,9 +121,12 @@ class ChatSessionListState extends ConsumerState<ChatSessionList> {
                 const SizedBox(
                   height: 12,
                 ),
-                _buildMenuItem('assets/icons/broom.png', () {
-                  ref.read(sessionListProvider.notifier).clearSessions();
-                }, "clear history"),
+                MenuItemWidget(
+                    iconPath: 'assets/icons/broom.png',
+                    onItemClick: () {
+                      ref.read(sessionListProvider.notifier).clearSessions();
+                    },
+                    title: "clear history"),
                 // _buildMenuItem('assets/icons/resume.png', () {}, "edit prompt"),
                 // _buildMenuItem('assets/icons/setting.png', () {}, "setting"),
               ],
@@ -124,102 +134,6 @@ class ChatSessionListState extends ConsumerState<ChatSessionList> {
           )
           // Add more list tiles for more users
         ],
-      ),
-    );
-  }
-
-  Widget _buildMenuItem(
-      String iconPath, OnItemClick onItemClick, String title) {
-    return Expanded(
-      child: Row(
-        children: [
-          SizedBox(
-            height: 24,
-            child: GestureDetector(
-              onTap: onItemClick,
-              child: SizedBox(
-                height: 10,
-                width: 30,
-                child: Image.asset(
-                  iconPath,
-                  fit: BoxFit.contain, // Cover fit
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 6,
-          ),
-          Text(
-            title,
-            style: const TextStyle(color: Colors.black),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildConversionItem(
-    ChatSession chatSession,
-    int index,
-    GestureTapCallback onTap,
-    BuildContext context,
-    WidgetRef ref,
-  ) {
-    String formattedDate = DateFormat('yyyy-MM-dd')
-        .format(widget.sessionList[index].updateTimestamp!);
-    bool showHeader = index == 0 ||
-        formattedDate !=
-            DateFormat('yyyy-MM-dd')
-                .format(widget.sessionList[index - 1].updateTimestamp!);
-    if (showHeader) {
-      String dateTip = AppUtils.instance.formatDateRelativeToToday(
-          widget.sessionList[index].updateTimestamp!);
-    }
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: SizedBox(
-        width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (showHeader)
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                // color: Colors.grey[300],
-                child: Text(formattedDate,
-                    style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black)),
-              ),
-            GestureDetector(
-              onTap: onTap,
-              onLongPress: () {
-                ref
-                    .read(sessionListProvider.notifier)
-                    .deleteSession(chatSession.id);
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  // const Icon(Icons.ac_unit),
-                  const SizedBox(width: 12), // Add space between items
-                  Expanded(
-                    child: Text(
-                      chatSession.title ?? chatSession.messages[0].content,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      softWrap: false,
-                      style: const TextStyle(color: Colors.black),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
