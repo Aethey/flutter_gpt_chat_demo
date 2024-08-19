@@ -14,6 +14,8 @@ class MenuItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // https://flutter.salon/flutter/deferfirstframe-precacheimage/
+    // precacheImage(AssetImage(iconPath), context);
     return Expanded(
       child: Row(
         children: [

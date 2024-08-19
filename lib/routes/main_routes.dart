@@ -17,7 +17,7 @@ class MainRoutes {
 var pageToRedirectToHandler =
     Handler(handlerFunc: (BuildContext? context, Map<String, dynamic>? params) {
   //pageToRedirectTo
-  return Container();
+  return const SizedBox();
 });
 
 // how to use

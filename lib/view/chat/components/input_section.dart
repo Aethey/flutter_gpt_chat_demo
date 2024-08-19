@@ -71,7 +71,7 @@ class InputSection extends StatelessWidget {
                               ),
                             );
                         }
-                        return Container();
+                        return const SizedBox();
                       }());
                 })),
       ),

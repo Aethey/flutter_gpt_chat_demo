@@ -173,7 +173,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                                                 .setCurrentSession();
                                           },
                                         )
-                                      : Container()
+                                      : const SizedBox()
                                 ],
                               ),
                             )),

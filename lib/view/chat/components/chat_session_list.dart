@@ -80,6 +80,7 @@ class ChatSessionListState extends ConsumerState<ChatSessionList> {
                       ),
                     )
                   : ListView.builder(
+                      // itemExtent: XX,
                       itemCount: widget.sessionList.length,
                       itemBuilder: (context, index) {
                         return ConversionItemWidget(
