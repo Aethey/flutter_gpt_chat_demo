@@ -21,17 +21,17 @@ class SessionListNotifier extends StateNotifier<List<ChatSession>> {
   }
 
   void deleteSession(String sessionId) async {
-    await HiveDB.deleteSession(sessionId); // delete session
+    await HiveDB().deleteSession(sessionId); // delete session
     state = state.where((session) => session.id != sessionId).toList(); //
   }
 
   Future<void> loadSessions() async {
-    List<ChatSession> sessions = await HiveDB.readAllChatSessions();
+    List<ChatSession> sessions = await HiveDB().readAllChatSessions();
     state = sessions; // Update state with the loaded sessions
   }
 
   Future<void> filterSessionsByDateLabel(String dateLabel) async {
-    List<ChatSession> sessions = await HiveDB.readAllChatSessions();
+    List<ChatSession> sessions = await HiveDB().readAllChatSessions();
     if (dateLabel == "all") {
       state = sessions;
     } else {
@@ -51,8 +51,8 @@ class SessionListNotifier extends StateNotifier<List<ChatSession>> {
     }
   }
 
-  void clearSessions() async {
-    await HiveDB.clearSessions();
+  Future<void> clearSessions() async {
+    await HiveDB().clearSessions();
     state = []; // Update state to empty list.
   }
 }

@@ -111,7 +111,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   }
 
   Future<void> _initializeTutorial() async {
-    bool needShowcase = await HiveDB.getNeedShowcase();
+    bool needShowcase = await HiveDB().getNeedShowcase();
     if (needShowcase) {
       createTutorial();
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -254,7 +254,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       opacityShadow: 0.5,
       imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
       onFinish: () async {
-        await HiveDB.setNeedShowcase(false);
+        await HiveDB().setNeedShowcase(false);
       },
       onSkip: () {
         return true;

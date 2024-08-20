@@ -36,7 +36,7 @@ class ChatNotifier extends StateNotifier<ChatSession> {
     state = state.copyWith(
         messages: [...state.messages, tmpMsg], updateTimestamp: DateTime.now());
     if (sessionID != null) {
-      HiveDB.addMessageToSession(sessionID, tmpMsg);
+      HiveDB().addMessageToSession(sessionID, tmpMsg);
     }
   }
 
@@ -53,7 +53,7 @@ class ChatNotifier extends StateNotifier<ChatSession> {
           updateTimestamp: DateTime.now(),
           messages: []);
     } else {
-      ChatSession? currentChatSession = await HiveDB.readChatSessionById(id);
+      ChatSession? currentChatSession = await HiveDB().readChatSessionById(id);
       if (currentChatSession != null) {
         state = currentChatSession;
       }
@@ -128,7 +128,7 @@ class ChatNotifier extends StateNotifier<ChatSession> {
               isFromAI: true,
               temporary: false,
               timestamp: DateTime.now());
-          HiveDB.addMessageToSession(chatSession.id, tmpMsg);
+          HiveDB().addMessageToSession(chatSession.id, tmpMsg);
         });
   }
 }

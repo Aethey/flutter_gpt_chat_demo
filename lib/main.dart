@@ -16,7 +16,7 @@ Future main() async {
   // init dotenv
   await dotenv.load(fileName: ".env");
   // init DB
-  await HiveDB.initHive();
+  await HiveDB().initHive();
 
   // init route
   final router = FluroRouter();

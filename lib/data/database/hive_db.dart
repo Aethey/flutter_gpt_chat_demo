@@ -4,61 +4,81 @@ import 'package:ry_chat/entity/chat_session.dart';
 import '../../config_dev.dart';
 
 class HiveDB {
+  // Private constructor
+  HiveDB._internal();
+
+  // Singleton instance
+  static final HiveDB _instance = HiveDB._internal();
+
+  // Factory constructor to return the singleton instance
+  factory HiveDB() {
+    return _instance;
+  }
+
   static const String _boxName = AppConfig.hiveBaseBoxName;
 
-  static Future<void> initHive() async {
-    // final appDocumentDir =
-    //     await path_provider.getApplicationDocumentsDirectory();
-    // Hive.init(appDocumentDir.path);
+  // Initialize Hive
+  Future<void> initHive() async {
     await Hive.initFlutter();
     Hive.registerAdapter(ChatMessageAdapter());
     Hive.registerAdapter(ChatSessionAdapter());
     await Hive.openBox(_boxName);
   }
 
-  static Box get _box => Hive.box(AppConfig.hiveBaseBoxName);
+  // Get the Box object
+  Box get _box => Hive.box(_boxName);
 
-  static Future<void> putData(String key, dynamic value) async {
+  // Store data
+  Future<void> putData(String key, dynamic value) async {
     await _box.put(key, value);
   }
 
-  static dynamic getData(String key) {
+  // Retrieve data
+  dynamic getData(String key) {
     return _box.get(key);
   }
 
-  static Future<void> removeData(String key) async {
+  // Remove data
+  Future<void> removeData(String key) async {
     await _box.delete(key);
   }
 
-  static Future<void> writeChatSession(ChatSession session) async {
+  // Write a chat session to Hive
+  Future<void> writeChatSession(ChatSession session) async {
     await _box.put(session.id, session);
   }
 
-  static Future<ChatSession?> readChatSessionById(String id) async {
+  // Read a chat session by ID
+  Future<ChatSession?> readChatSessionById(String id) async {
     return _box.get(id) as ChatSession?;
   }
 
-  static Future<void> setNeedShowcase(bool needShowcase) async {
-    await _box.put("setNeedShowcase", needShowcase);
+  // Set whether the showcase tutorial needs to be displayed
+  Future<void> setNeedShowcase(bool needShowcase) async {
+    await _box.put("needShowcase", needShowcase);
   }
 
-  static Future<bool> getNeedShowcase() async {
-    return _box.get("setNeedShowcase") ?? true;
+  // Get whether the showcase tutorial needs to be displayed
+  Future<bool> getNeedShowcase() async {
+    return _box.get("needShowcase") ?? true;
   }
 
-  static Future<void> setCurrentSession(String sessionID) async {
+  // Set the current session ID
+  Future<void> setCurrentSession(String sessionID) async {
     await _box.put("currentSessionID", sessionID);
   }
 
-  static Future<void> getCurrentSession() async {
+  // Get the current session ID
+  Future<String> getCurrentSession() async {
     return _box.get("currentSessionID") ?? "";
   }
 
-  static Future<List<ChatSession>> readAllChatSessions() async {
+  // Read all chat sessions from Hive
+  Future<List<ChatSession>> readAllChatSessions() async {
     List<ChatSession> sessions = [];
     for (var key in _box.keys) {
-      var session = _box.get(key) as ChatSession?;
-      if (session != null) {
+      dynamic session = _box.get(key);
+      if (session is ChatSession) {
         session = session.updateTimestamp != null
             ? session
             : session.copyWith(updateTimestamp: DateTime.now());
@@ -69,7 +89,8 @@ class HiveDB {
     return sessions;
   }
 
-  static Future<void> addMessageToSession(
+  // Add a message to a specific session
+  Future<void> addMessageToSession(
       String sessionId, ChatMessage newMessage) async {
     var session = _box.get(sessionId) as ChatSession?;
 
@@ -84,22 +105,24 @@ class HiveDB {
       // Put the updated session back into the box
       await _box.put(sessionId, updatedSession);
     } else {
+      // Create a new session if it does not exist
       var newSession = ChatSession(
         id: sessionId,
         messages: [newMessage],
         createTimestamp: DateTime.now(),
-        updateTimestamp:
-            DateTime.now(), // Start with the new message as the first message
+        updateTimestamp: DateTime.now(),
       );
       await _box.put(sessionId, newSession);
     }
   }
 
-  static Future<void> deleteSession(String sessionId) async {
-    await _box.delete(sessionId); // delete session by id
+  // Delete a session by ID
+  Future<void> deleteSession(String sessionId) async {
+    await _box.delete(sessionId); // Delete session by ID
   }
 
-  static Future<void> clearSessions() async {
-    await _box.clear(); // This clears all entries in the box.
+  // Clear all sessions from the box
+  Future<void> clearSessions() async {
+    await _box.clear(); // Clear all entries in the box
   }
 }
