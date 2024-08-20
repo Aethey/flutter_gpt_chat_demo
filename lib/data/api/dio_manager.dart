@@ -138,16 +138,16 @@ class DioManager {
         onStreamingCallback();
       }, onDone: () {
         onProcessClose();
-        onStreamStopCallback(accumulatedContent.toString() ?? "");
+        onStreamStopCallback(accumulatedContent.toString());
       }, onError: (e) {
         onProcessError('request data failed: $e');
         onProcessClose();
-        onStreamStopCallback(accumulatedContent.toString() ?? "");
+        onStreamStopCallback(accumulatedContent.toString());
       });
     } catch (e) {
       onProcessError(_handleError(e));
       onProcessClose();
-      onStreamStopCallback(accumulatedContent.toString() ?? "");
+      onStreamStopCallback(accumulatedContent.toString());
     } finally {
       // process every time
       // controller.close();
