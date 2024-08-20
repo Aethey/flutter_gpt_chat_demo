@@ -20,7 +20,7 @@ class SessionListNotifier extends StateNotifier<List<ChatSession>> {
     ];
   }
 
-  void deleteSession(String sessionId) async {
+  Future<void> deleteSession(String sessionId) async {
     await HiveDB().deleteSession(sessionId); // delete session
     state = state.where((session) => session.id != sessionId).toList(); //
   }
