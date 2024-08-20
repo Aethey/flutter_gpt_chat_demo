@@ -41,6 +41,36 @@ class DioManager {
     ));
   }
 
+  Future<Response?> generateImage({
+    required String prompt,
+    String model = "dall-e-3",
+    int n = 1,
+    String size = '1024x1024',
+  }) async {
+    Options options = Options(headers: {
+      'Authorization': 'Bearer $apiKey',
+      'Content-Type': 'application/json',
+    });
+    try {
+      final response = await _dio.post(
+        '/v1/images/generations',
+        data: {
+          'model': model,
+          'prompt': prompt,
+          'n': n,
+          'size': size,
+        },
+        options: options,
+      );
+      return response;
+    } on DioException catch (e) {
+      if (kDebugMode) {
+        print('Image Generation Failed: ${e.message}');
+      }
+      return null;
+    }
+  }
+
   // Regular API call common
   Future<void> fetchRegularResponse(
       {String? path,

@@ -5,9 +5,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uuid/uuid.dart';
 import '../../entity/chat_session.dart';
 import '../../state/chat_state.dart';
+import '../../state/image_generation_state.dart';
 import '../../state/session_list_state.dart';
 import 'components/chat_main.dart';
 import 'components/chat_session_list.dart';
+import 'components/custom_header_dialog.dart';
 import 'components/input_section.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -103,6 +105,29 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     ref.read(sessionListProvider.notifier).loadSessions();
   }
 
+  // Function to show a custom dialog
+  Future<void> _showMyDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Dialog is not dismissible by tapping outside
+      builder: (BuildContext context) {
+        return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            clipBehavior: Clip.hardEdge,
+            child: CustomHeaderDialog(
+              onFirstAction: () {
+                ref.read(imageGenerationProvider.notifier).generateImage();
+              },
+              onSecondAction: () {
+                Navigator.of(context).pop();
+              },
+            ));
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final sessionListSession = ref.watch(sessionListProvider);
@@ -138,12 +163,17 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                                     width: 1.sw * 2 / 3,
                                     child: Row(
                                       children: [
-                                        Image.asset(
-                                          'assets/icons/robot1.png',
-                                          width: 45, // Image width
-                                          height: 45, // Image height
-                                          fit: BoxFit.cover, // Cover fit
-                                          key: const ValueKey('text'),
+                                        GestureDetector(
+                                          child: Image.asset(
+                                            'assets/icons/robot1.png',
+                                            width: 45, // Image width
+                                            height: 45, // Image height
+                                            fit: BoxFit.cover, // Cover fit
+                                            key: const ValueKey('text'),
+                                          ),
+                                          onLongPress: () {
+                                            _showMyDialog(context);
+                                          },
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
