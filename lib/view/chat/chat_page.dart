@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:uuid/uuid.dart';
+import '../../data/database/hive_db.dart';
 import '../../entity/chat_session.dart';
 import '../../state/chat_state.dart';
 import '../../state/image_generation_state.dart';
@@ -25,6 +27,8 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   final ValueNotifier<int> _buttonType = ValueNotifier<int>(0);
   final ValueNotifier<bool> _isStreaming = ValueNotifier<bool>(false);
   final ScrollController _scrollController = ScrollController();
+  late TutorialCoachMark tutorialCoachMark;
+  GlobalKey keyOne = GlobalKey();
 
   void _sendMessage(ChatSession chatSession) {
     if (_controller.text.isNotEmpty) {
@@ -103,6 +107,17 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     super.initState();
     _controller.addListener(_handleTextChange);
     ref.read(sessionListProvider.notifier).loadSessions();
+    _initializeTutorial();
+  }
+
+  Future<void> _initializeTutorial() async {
+    bool needShowcase = await HiveDB.getNeedShowcase();
+    if (needShowcase) {
+      createTutorial();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showTutorial();
+      });
+    }
   }
 
   // Function to show a custom dialog
@@ -164,6 +179,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                                     child: Row(
                                       children: [
                                         GestureDetector(
+                                          key: keyOne,
                                           child: Image.asset(
                                             'assets/icons/robot1.png',
                                             width: 45, // Image width
@@ -223,5 +239,58 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         ),
       ),
     );
+  }
+
+  void showTutorial() {
+    tutorialCoachMark.show(context: context);
+  }
+
+  void createTutorial() {
+    tutorialCoachMark = TutorialCoachMark(
+      targets: _createTargets(),
+      colorShadow: Colors.grey,
+      textSkip: "SKIP",
+      paddingFocus: 10,
+      opacityShadow: 0.5,
+      imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      onFinish: () async {
+        await HiveDB.setNeedShowcase(false);
+      },
+      onSkip: () {
+        return true;
+      },
+    );
+  }
+
+  List<TargetFocus> _createTargets() {
+    List<TargetFocus> targets = [];
+    targets.add(
+      TargetFocus(
+        identify: "keyOne",
+        keyTarget: keyOne,
+        alignSkip: Alignment.topRight,
+        enableOverlayTab: true,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return const Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Long press to generate an image",
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+    return targets;
   }
 }

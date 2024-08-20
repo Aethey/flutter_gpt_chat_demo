@@ -38,6 +38,14 @@ class HiveDB {
     return _box.get(id) as ChatSession?;
   }
 
+  static Future<void> setNeedShowcase(bool needShowcase) async {
+    await _box.put("setNeedShowcase", needShowcase);
+  }
+
+  static Future<bool> getNeedShowcase() async {
+    return _box.get("setNeedShowcase") ?? true;
+  }
+
   static Future<void> setCurrentSession(String sessionID) async {
     await _box.put("currentSessionID", sessionID);
   }
