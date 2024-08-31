@@ -11,12 +11,12 @@ create a **.env** file in **root directory** with **OPENAI_API_KEY=your apiKey**
 | ![Image 1](assets/screenshot/1.png) | ![Image 2](assets/screenshot/2.png) | ![Image 3](assets/screenshot/3.png) |
 
 ## Local Whisper
-For implementing Whisper on Android, you can refer to the following project:
+For implementing Whisper on Mobile, you can refer to the following project:
 [nyadla-sys/whisper.tflite](https://github.com/nyadla-sys/whisper.tflite)
 
 ### Android
 
-To implement Whisper on Mobile, please note the following:
+To run this code, please note the following:
 
 - **Real Device Required**: This implementation must be tested and run on a real Android device.
 - **Model Files**: You need to download the model files and place them in the `assets/model/` directory located in the root of your project.
