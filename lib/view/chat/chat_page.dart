@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,11 +10,14 @@ import '../../entity/chat_session.dart';
 import '../../state/chat_state.dart';
 import '../../state/image_generation_state.dart';
 import '../../state/session_list_state.dart';
+import '../../state/speech_recognition_state.dart';
 import 'components/chat_main.dart';
 import 'components/chat_session_list.dart';
 import 'components/custom_header_dialog.dart';
 import 'components/input_section.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'components/speech_recognition_dialog.dart';
 
 class ChatPage extends ConsumerStatefulWidget {
   const ChatPage({super.key});
@@ -30,7 +34,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   late TutorialCoachMark tutorialCoachMark;
   GlobalKey keyOne = GlobalKey();
 
-  void _sendMessage(ChatSession chatSession) {
+  Future<void> _sendMessage(ChatSession chatSession) async {
     if (_controller.text.isNotEmpty) {
       ref
           .read(chatProvider.notifier)
@@ -81,6 +85,18 @@ class _ChatPageState extends ConsumerState<ChatPage> {
             _isStreaming.value = false;
           });
       _controller.clear();
+    } else {
+      if (Platform.isAndroid) {
+        if (mounted) {
+          _showSpeechDialog(context, () async {
+            ref.read(speechRecognitionProvider.notifier).startRecording();
+          }, () async {
+            ref.read(speechRecognitionProvider.notifier).stopRecording();
+          });
+        }
+      } else {
+        debugPrint(".....");
+      }
     }
   }
 
@@ -136,6 +152,28 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                 ref.read(imageGenerationProvider.notifier).generateImage();
               },
               onSecondAction: () {
+                Navigator.of(context).pop();
+              },
+            ));
+      },
+    );
+  }
+
+  Future<void> _showSpeechDialog(BuildContext context,
+      OnFirstAction onFirstAction, OnSecondAction onSecondAction) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Dialog is not dismissible by tapping outside
+      builder: (BuildContext context) {
+        return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            clipBehavior: Clip.hardEdge,
+            child: SpeechRecognitionDialog(
+              onFirstAction: onFirstAction,
+              onSecondAction: () {
+                onSecondAction();
                 Navigator.of(context).pop();
               },
             ));

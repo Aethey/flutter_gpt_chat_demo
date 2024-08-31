@@ -30,6 +30,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+/whisper_tiny_flutter/example/
 
 # Symbolication related
 app.*.symbols

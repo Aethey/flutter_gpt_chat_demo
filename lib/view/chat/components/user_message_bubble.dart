@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat_message.dart';
-import '../../../state/message_list_provider.dart';
+import '../../../state/message_list_state.dart';
 import 'chat_main.dart';
 
 class UserMessageBubble extends StatelessWidget {
