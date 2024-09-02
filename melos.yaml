@@ -1,0 +1,31 @@
+name: ry_chat
+packages:
+  - .
+  - whisper_tiny_flutter/
+
+scripts:
+  # Initialize all packages without recursively calling 'melos bootstrap' again
+  bootstrap: |
+    melos exec --ignore="*" -- flutter pub get  # Execute flutter pub get across all packages
+
+  analyze: melos exec -- flutter analyze
+  clean: melos exec -- flutter clean
+
+  # Run code generation tasks, like build_runner, across all packages
+  build_runner: melos exec -- flutter pub run build_runner build --delete-conflicting-outputs
+
+  # Format all code across all packages
+  format_code: melos exec -- flutter format .
+
+  # Analyze code across all packages
+  lint: melos exec -- flutter analyze
+
+  # Run tests across all packages
+  test: melos exec -- flutter test
+
+# Version management settings
+versioning:
+  conventional_commits: true
+  apply_git_tag: true
+  tag_prefix: "v"
+  changelog: true
