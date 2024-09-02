@@ -1,10 +1,6 @@
 import 'whisper_tiny_flutter_platform_interface.dart';
 
 class WhisperTinyFlutter {
-  Future<String?> getPlatformVersion() async {
-    return WhisperTinyFlutterPlatform.instance.getPlatformVersion();
-  }
-
   Future<void> startRecording() async {
     WhisperTinyFlutterPlatform.instance.startRecording();
   }

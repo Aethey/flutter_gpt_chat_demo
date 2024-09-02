@@ -24,10 +24,6 @@ abstract class WhisperTinyFlutterPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
-  }
-
   Future<void> startRecording() {
     throw UnimplementedError('startRecording() has not been implemented.');
   }
