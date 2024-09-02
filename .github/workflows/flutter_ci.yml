@@ -15,8 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Install jq and yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          sudo apt-get install -y yq
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
