@@ -1,5 +1,6 @@
 
 ## A Flutter gpt chat demo.
+![test CI](https://github.com/Aethey/flutter_gpt_chat_demo/actions/workflows/flutter_ci.yml/badge.svg)
 
 **how to build it**:  
 create a **.env** file in **root directory** with **OPENAI_API_KEY=your apiKey**
