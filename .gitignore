@@ -59,3 +59,6 @@ app.*.map.json
 /android/app/src/main/assets/
 /assets/model/
 
+pubspec_overrides.yaml
+
+

@@ -78,6 +78,8 @@ dependencies:
   mockito: ^5.4.4
 #  drift: ^2.19.1+1
 #  drift_flutter: ^0.1.0
+  whisper_tiny_flutter:
+    path: whisper_tiny_flutter
 
 dev_dependencies:
   flutter_test:
@@ -95,8 +97,8 @@ dev_dependencies:
   riverpod_lint: ^2.3.12
   hive_generator: ^2.0.1
   json_serializable: ^6.8.0
-  whisper_tiny_flutter:
-    path: whisper_tiny_flutter
+  melos: 6.1.0
+
 
 #  drift_dev: ^2.19.1
 
