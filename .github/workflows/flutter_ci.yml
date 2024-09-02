@@ -38,6 +38,11 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Create .env file
+        run: |
+          echo "HUGGING_FACE_API_KEY=${{ secrets.HUGGING_FACE_API_KEY }}" >> .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY}}" >> .env
+
       - name: Run Melos bootstrap
         run: flutter pub global activate melos && melos bootstrap
 
