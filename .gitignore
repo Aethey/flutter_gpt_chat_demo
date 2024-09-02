@@ -57,7 +57,7 @@ app.*.map.json
 /android/app/.cxx/
 /android/app/src/main/cpp/samples/
 /android/app/src/main/assets/
-/assets/model/
+/assets/model/*
 
 pubspec_overrides.yaml
 
