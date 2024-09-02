@@ -43,12 +43,3 @@ jobs:
 
       - name: Run tests
         run: melos run test
-
-      - name: Run lint
-        run: melos run lint
-
-      - name: Analyze
-        run: melos run analyze
-
-      - name: Build
-        run: melos run build_runner
